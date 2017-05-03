@@ -1,0 +1,64 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+cwd     = os.path.join(str(Dir('#')), 'drivers')
+
+# add the general drivers.
+src = Split("""
+board.c
+stm32f1xx_it.c
+drv_led.c
+drv_usart.c
+cvt.c
+""")
+
+if GetDepend(['RT_USING_PIN']):
+    src += ['drv_gpio.c']
+	
+if GetDepend(['RT_USING_HWADC']):
+    src += ['drv_hwadc.c','adc.c']	
+	
+#add hardware timer driver.
+if GetDepend(['RT_USING_HWTIMER']):
+    src += ['drv_hwtimer.c','tim.c']
+	
+if GetDepend(['RT_USING_HWBUTTON']):
+    src += ['drv_hwbutton.c']	
+
+if GetDepend(['RT_USING_LCDHT1621B']):
+    src = src + ['drv_lcdht1621b.c']	
+	
+if GetDepend(['RT_USING_XT8XXP8']):
+    src = src + ['drv_xt8xxp8.c']	
+	
+# add canbus driver.
+if GetDepend('RT_USING_CAN'):
+    src += ['bxcan.c']
+
+# add Ethernet drivers.
+if GetDepend('RT_USING_LWIP'):
+    src += ['dm9000a.c']
+
+# add Ethernet drivers.
+if GetDepend('RT_USING_DFS'):
+    src += ['sdcard.c']
+
+# add Ethernet drivers.
+if GetDepend('RT_USING_RTC'):
+    src += ['rtc.c']
+
+# add Ethernet drivers.
+if GetDepend('RT_USING_RTGUI'):
+    src += ['touch.c']
+    if rtconfig.RT_USING_LCD_TYPE == 'ILI932X':
+        src += ['ili_lcd_general.c']
+    elif rtconfig.RT_USING_LCD_TYPE == 'SSD1289':
+        src += ['ssd1289.c']
+
+    
+CPPPATH = [cwd]
+
+group = DefineGroup('Drivers', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
