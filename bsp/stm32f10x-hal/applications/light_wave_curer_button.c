@@ -32,7 +32,7 @@
 #include "drv_hwbutton.h"
 
 #include "light_wave_curer.h"
-
+#ifdef RT_USING_LIGHT_WAVE_CURER
 lwc_cure_t lct;
 
 ALIGN(RT_ALIGN_SIZE)
@@ -953,6 +953,6 @@ void lwc_button_thread_entry(void* parameter)
         }
     }
 }
-
+#endif /* #define RT_USING_LIGHT_WAVE_CURER */
 
 /*@}*/

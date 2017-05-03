@@ -291,15 +291,15 @@ static rt_err_t drv_hwadc_stop_DMA(rt_device_hwadc_t *devadc)
 
 static rt_size_t drv_hwadc_read(rt_device_hwadc_t *devadc, rt_off_t pos, void *buffer, rt_size_t size)
 { 
-    
-    drv_hwadc_t *hwadc;    
+        
     /* check parameters */
     RT_ASSERT(devadc != RT_NULL);
     RT_ASSERT(buffer != RT_NULL);
-    hwadc = (drv_hwadc_t *)devadc->parent.user_data;  
+    
     uint32_t *recv = (uint32_t*)buffer;
        
-    #if defined RT_USING_ADC_GENERIC_MODE    
+    #if defined RT_USING_ADC_GENERIC_MODE   
+		drv_hwadc_t *hwadc = (drv_hwadc_t *)devadc->parent.user_data;    
     if(HAL_OK == HAL_ADC_PollForConversion(&hwadc->adcHandle,1000))
     {
         recv[0] = devadc->adc_converted_value[0] = HAL_ADC_GetValue(&hwadc->adcHandle);         

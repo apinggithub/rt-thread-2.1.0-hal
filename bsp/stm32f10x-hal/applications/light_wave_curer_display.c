@@ -31,7 +31,7 @@
 #include "drv_hwbutton.h"
 
 #include "light_wave_curer.h"
-
+#ifdef RT_USING_LIGHT_WAVE_CURER
 extern lwc_cure_t lct;
 //static rt_err_t seglcd_dislay_time(rt_device_t dev, rt_lcd_ramdat_t *lcds, uint8_t tmr_value, uint8_t flag);
 static rt_err_t seglcd_display(rt_device_t dev, lwc_cure_t *lc);
@@ -1626,6 +1626,6 @@ void lwc_force_display(rt_device_t dev, lwc_cure_t *lc)
            
 }    
 
-
+#endif /* #define RT_USING_LIGHT_WAVE_CURER */
 
 /*@}*/

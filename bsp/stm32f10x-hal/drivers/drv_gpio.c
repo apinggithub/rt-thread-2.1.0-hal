@@ -425,10 +425,10 @@ static int stm32_pin_read(rt_device_t dev, rt_base_t pin)
 
 static void stm32_pin_toggle(rt_device_t dev, rt_base_t pin)
 {
-    int value;
+    
     const struct pin_index *index;
 
-    value = PIN_LOW;
+    //int value = PIN_LOW;
 
     index = get_pin(pin);
     if (index == RT_NULL)

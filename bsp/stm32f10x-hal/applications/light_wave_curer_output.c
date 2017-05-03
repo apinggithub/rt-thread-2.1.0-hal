@@ -35,7 +35,7 @@
 
 //#include "adctest/bsp_adc.h"
 #include "light_wave_curer.h"
-
+#ifdef RT_USING_LIGHT_WAVE_CURER
 static rt_err_t lwc_cure_timer2_output(rt_device_t dev, lwc_cure_t *lc);
 static rt_err_t lwc_cure_timer3_output(rt_device_t dev, lwc_cure_t *lc);
 static rt_err_t lwc_cure_timer4_output(rt_device_t dev, lwc_cure_t *lc);
@@ -1293,5 +1293,5 @@ static rt_err_t lwc_cure_ion_output(lwc_cure_t *lc)
     return err;        
 }
 
-
+#endif /* #define RT_USING_LIGHT_WAVE_CURER */
 /*@}*/
