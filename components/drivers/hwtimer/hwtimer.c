@@ -48,13 +48,13 @@ static rt_err_t rt_hwtimer_init(struct rt_device *dev)
 {
     rt_err_t result = RT_EOK;
     rt_device_hwtimer_t *timer;
-    drv_hwtimer_t *hwtim; 
+    
     timer = (rt_device_hwtimer_t *)dev;   
     RT_ASSERT(timer != RT_NULL);          
     RT_ASSERT(timer->freq != 0);
    
     RT_ASSERT(timer != RT_NULL);
-    hwtim = (drv_hwtimer_t *)timer->parent.user_data;
+    //drv_hwtimer_t *hwtim = (drv_hwtimer_t *)timer->parent.user_data;
     
     //double eps = 1e-6; /* eps = 10^-6 */
     
@@ -242,11 +242,10 @@ static rt_err_t rt_hwtimer_control(struct rt_device *dev, rt_uint8_t cmd, void *
 {
     rt_err_t result = RT_EOK;
     rt_device_hwtimer_t *timer;
-    drv_hwtimer_t *hwtim;
-    
+       
     timer = (rt_device_hwtimer_t *)dev;
     RT_ASSERT(timer != RT_NULL);      
-    hwtim = (drv_hwtimer_t *)timer->parent.user_data;
+    drv_hwtimer_t *hwtim = (drv_hwtimer_t *)timer->parent.user_data;
     
     //double eps = 1e-6; /* eps = 10^-6 */
 

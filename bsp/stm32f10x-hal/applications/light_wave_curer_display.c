@@ -45,7 +45,7 @@ rt_uint8_t lwc_display_stack[2048];
 struct rt_thread lwc_display_thread;
 
 
-/*定时器超时函数*/
+/*定时器超时函�/
 static void timeout_blink(void* parameter)
 {
 	//rt_kprintf("periodic timer is timeout\n");	
@@ -84,8 +84,8 @@ void lwc_display_thread_entry(void* parameter)
 	rt_timer_init(&timerblink, "timerblink", /* 定时器名为timerblink */
 	timeout_blink, /* 超时函数回调处理 */
 	RT_NULL, /* 超时函数入口参数*/
-	1, /* 定时长度,OS 以Tick为单位,即1个OS Tick 产生一次超时处理*/
-	RT_TIMER_FLAG_PERIODIC); /* 周期性定时*/
+	1, /* 定时长度,OS 以Tick为单��个OS Tick 产生一次超时处�/
+	RT_TIMER_FLAG_PERIODIC); /* 周期性定�/
 	
 	rt_timer_start(&timerblink);
     
@@ -361,7 +361,7 @@ rt_err_t seglcd_display(rt_device_t dev, lwc_cure_t *lc)
     RT_ASSERT(dev != RT_NULL);
     RT_ASSERT(lc != RT_NULL);
     
-    if(0 == lc->lreg.btn.button_jy)/* 非静音 */
+    if(0 == lc->lreg.btn.button_jy)/* 非静�*/
     {
         lc->lcdr[12].dat |= 0x01;
         rt_device_write(dev, 0, &lc->lcdr[12], sizeof(lc->lcdr[12]));

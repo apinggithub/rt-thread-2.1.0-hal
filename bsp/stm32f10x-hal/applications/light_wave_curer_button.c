@@ -43,7 +43,7 @@ struct rt_timer timertip;
 struct rt_timer timermusic;
 static struct rt_timer timer_shutdown;
 
-struct rt_event event;/* 事件控制块*/
+struct rt_event event;/* 事件控制�/
 
 static uint32_t tmr_init_val = 0;
 static uint32_t tmr_count_dec = 0;
@@ -53,7 +53,7 @@ uint8_t flag_force_voice_play = 0;
 //extern uint32_t freq_music[6];
 //extern uint32_t freq_music;
 
-/*定时器超时函数*/
+/*定时器超时函�/
 static void timeout_dec(void* parameter)
 {
 
@@ -68,7 +68,7 @@ static void timeout_dec(void* parameter)
         rt_event_send(&event, RT_EVENT_LWC_TIMER_FINISH_CLOSE);        
     }
 }
-/*定时器超时函数*/
+/*定时器超时函�/
 static void timeout_tip(void* parameter)
 {
     tmr_count_tip++;    
@@ -86,7 +86,7 @@ static void timeout_shutdown(void* parameter)
     //}  
     rt_event_send(&event, RT_EVENT_LWC_DEVICE_FORCE_CLOSE);
 }
-/*定时器超时函数*/
+/*定时器超时函�/
 //uint32_t icbuffer[HWTMR_IC_BUF_SIZE];
 static void timeout_music(void *parameter)
 { 
@@ -204,7 +204,7 @@ void lwc_button_thread_entry(void* parameter)
         while(1);
     }
     
-     /* 打开 XTP 设备 播放提示音 */        
+     /* 打开 XTP 设备 播放提示�*/        
     if ((dev_xtp = rt_device_find(XTP)) == RT_NULL)
     {
         rt_kprintf("No Device: %s\n", XTP);
@@ -220,8 +220,8 @@ void lwc_button_thread_entry(void* parameter)
 	rt_timer_init(&timerdec, "timerdec", /* 定时器名为timerdec */
 	timeout_dec, /* 超时函数回调处理 */
 	RT_NULL, /* 超时函数入口参数*/
-	1000, /* 定时长度,OS 以Tick为单位,即1000个OS Tick 产生一次超时处理 */
-	RT_TIMER_FLAG_PERIODIC); /* 周期性定时 */
+	1000, /* 定时长度,OS 以Tick为单��000个OS Tick 产生一次超时处�*/
+	RT_TIMER_FLAG_PERIODIC); /* 周期性定�*/
     
     rt_device_t dev_hwtimer1 = RT_NULL;    
     rt_device_hwtimer_t *timer1;
@@ -234,22 +234,22 @@ void lwc_button_thread_entry(void* parameter)
 	rt_timer_init(&timermusic, "timermusic", /* 定时器名为timermusic */
 	timeout_music, /* 超时函数回调处理 */
 	timer1, /* 超时函数入口参数*/
-	100, /* 定时长度,OS 以Tick为单位,即100个OS Tick 产生一次超时处理 */
-	RT_TIMER_FLAG_PERIODIC); /* 周期性定时 */
+	100, /* 定时长度,OS 以Tick为单��00个OS Tick 产生一次超时处�*/
+	RT_TIMER_FLAG_PERIODIC); /* 周期性定�*/
 
     /* 初始化定时器 */
 	rt_timer_init(&timertip, "timertip", /* 定时器名为timerdec */
 	timeout_tip, /* 超时函数回调处理 */
 	RT_NULL, /* 超时函数入口参数*/
-	100, /* 定时长度,OS 以Tick为单位,即100个OS Tick 产生一次超时处理 */
-	RT_TIMER_FLAG_PERIODIC); /* 周期性定时 */
+	100, /* 定时长度,OS 以Tick为单��00个OS Tick 产生一次超时处�*/
+	RT_TIMER_FLAG_PERIODIC); /* 周期性定�*/
     
     /* 初始化定时器 */
 	rt_timer_init(&timer_shutdown, "timer_shutdown", /* 定时器名为timer_shutdown */
 	timeout_shutdown, /* 超时函数回调处理 */
 	RT_NULL, /* 超时函数入口参数*/
-	1000*60, /* 定时长度,OS 以Tick为单位,即1000个OS Tick (1s)产生一次超时处理 */
-	RT_TIMER_FLAG_PERIODIC); /* 周期性定时 */
+	1000*60, /* 定时长度,OS 以Tick为单��000个OS Tick (1s)产生一次超时处�*/
+	RT_TIMER_FLAG_PERIODIC); /* 周期性定�*/
     
     while (1)
     {
@@ -289,7 +289,7 @@ void lwc_button_thread_entry(void* parameter)
                     vcno = 0x5A + 3;/* 30分钟 */
                     rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));                   
                     rt_thread_delay(1*RT_TICK_PER_SECOND );
-                    vcno = 0x5A + 64;/* 超音波治疗输出强度 弱档 */
+                    vcno = 0x5A + 64;/* 超音波治疗输出强�弱档 */
                     rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                 }                   
             }            
@@ -349,7 +349,7 @@ void lwc_button_thread_entry(void* parameter)
                         vcno = 0x5A + 3;/* 30分钟 */
                         rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));                   
                         rt_thread_delay(1*RT_TICK_PER_SECOND );
-                        vcno = 0x5A + 64;/* 超音波治疗输出强度 弱档 */
+                        vcno = 0x5A + 64;/* 超音波治疗输出强�弱档 */
                         rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                     }                                                                          
                 }
@@ -391,7 +391,7 @@ void lwc_button_thread_entry(void* parameter)
                         lct.lway[SET_TIMER].status = LWC_ACTIVED;
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 62;/* 欢迎使用光波康复理疗仪，请定时 */
+                            vcno = 0x5A + 62;/* 欢迎使用光波康复理疗仪，请定�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));                             
                             //rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));                                
                         }
@@ -405,7 +405,7 @@ void lwc_button_thread_entry(void* parameter)
                             vcno = 0x5A + 1;/* 10分钟 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));  
                             rt_thread_delay(1*RT_TICK_PER_SECOND );
-                            vcno = 0x5A + 4;/* 请设置治疗方式 */
+                            vcno = 0x5A + 4;/* 请设置治疗方�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }
                         //rt_event_send(&event, RT_EVENT_LWC_BUTTON_UPDATE);
@@ -418,7 +418,7 @@ void lwc_button_thread_entry(void* parameter)
                             vcno = 0x5A + 2;/* 20分钟 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                             rt_thread_delay(1*RT_TICK_PER_SECOND );
-                            vcno = 0x5A + 4;/* 请设置治疗方式 */
+                            vcno = 0x5A + 4;/* 请设置治疗方�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }
                         //rt_event_send(&event, RT_EVENT_LWC_BUTTON_UPDATE);
@@ -431,7 +431,7 @@ void lwc_button_thread_entry(void* parameter)
                             vcno = 0x5A + 3;/* 30分钟 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                             rt_thread_delay(1*RT_TICK_PER_SECOND );
-                            vcno = 0x5A + 4;/* 请设置治疗方式 */
+                            vcno = 0x5A + 4;/* 请设置治疗方�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }
                         //rt_event_send(&event, RT_EVENT_LWC_BUTTON_UPDATE);
@@ -445,7 +445,7 @@ void lwc_button_thread_entry(void* parameter)
                 }
             }
             break;
-            case BUTTON_JG:/* 0x22 激光 */
+            case BUTTON_JG:/* 0x22 激�*/
             {
                 if((1 < lct.lreg.btn.button_dyds)&&(LWC_INACTIVE == lct.lcf[IONICE_CURE].cure_out_actived))
                 {
@@ -457,7 +457,7 @@ void lwc_button_thread_entry(void* parameter)
                     {    
                         if((0 == flag_voice_close)&&(10 != lct.lreg.btn.button_gn))
                         {
-                            vcno = 0x5A + 28;/* 激光治疗关闭 */                   
+                            vcno = 0x5A + 28;/* 激光治疗关�*/                   
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));   
                         }                        
                         lct.lreg.btn.button_jg = 0;
@@ -471,7 +471,7 @@ void lwc_button_thread_entry(void* parameter)
                         lct.lway[LASER_CURE].status = LWC_ACTIVED;                           
                         if((0 == flag_voice_close)&&(10 != lct.lreg.btn.button_gn))
                         {
-                            vcno = 0x5A + 49;/* 激光治疗输出强度 弱档 */
+                            vcno = 0x5A + 49;/* 激光治疗输出强�弱档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }
                         rt_timer_stop(&timer_shutdown);
@@ -480,7 +480,7 @@ void lwc_button_thread_entry(void* parameter)
                     {
                         if((0 == flag_voice_close)&&(10 != lct.lreg.btn.button_gn))
                         {
-                            vcno = 0x5A + 50;/* 激光治疗输出强度 中档 */
+                            vcno = 0x5A + 50;/* 激光治疗输出强�中档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                         }
                         rt_timer_stop(&timer_shutdown);
@@ -489,7 +489,7 @@ void lwc_button_thread_entry(void* parameter)
                     {
                         if((0 == flag_voice_close)&&(10 != lct.lreg.btn.button_gn))
                         {
-                            vcno = 0x5A + 51;/* 激光治疗输出强度 强档 */
+                            vcno = 0x5A + 51;/* 激光治疗输出强�强档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         } 
                         rt_timer_stop(&timer_shutdown);
@@ -562,7 +562,7 @@ void lwc_button_thread_entry(void* parameter)
                     { 
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 67;/* 超音波治疗关闭 */                   
+                            vcno = 0x5A + 67;/* 超音波治疗关�*/                   
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }                            
                         lct.lreg.btn.button_lzlf = 0;
@@ -588,7 +588,7 @@ void lwc_button_thread_entry(void* parameter)
                         lct.lway[IONICE_CURE].status = LWC_ACTIVED;     
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 64;/* 超音波治疗输出强度 弱档 */
+                            vcno = 0x5A + 64;/* 超音波治疗输出强�弱档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                         } 
                         rt_timer_stop(&timer_shutdown);
@@ -598,7 +598,7 @@ void lwc_button_thread_entry(void* parameter)
                     {
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 65;/* 超音波治疗输出强度 中档 */
+                            vcno = 0x5A + 65;/* 超音波治疗输出强�中档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));
                         }
                         rt_timer_stop(&timer_shutdown);
@@ -607,7 +607,7 @@ void lwc_button_thread_entry(void* parameter)
                     {
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 66;/* 超音波治疗输出强度 强档 */
+                            vcno = 0x5A + 66;/* 超音波治疗输出强�强档 */
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                         }
                         rt_timer_stop(&timer_shutdown);
@@ -625,14 +625,14 @@ void lwc_button_thread_entry(void* parameter)
                     {
                         lct.lreg.btn.button_gn = 1;
                     } 
-                    if(1 == lct.lreg.btn.button_gn) /* 1 全功能 */
+                    if(1 == lct.lreg.btn.button_gn) /* 1 全功�*/
                     { 
                         lct.lreg.btn.button_zl1 = 0;
                         lct.lreg.btn.button_zl2 = 0;
                         lct.lway[FUNCTION].status = LWC_ACTIVED; 
                         if(0 == flag_voice_close)
                         {
-                            vcno = 0x5A + 9; /* 全功能 */
+                            vcno = 0x5A + 9; /* 全功�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno));   
                         }                                                
                     } 
@@ -771,7 +771,7 @@ void lwc_button_thread_entry(void* parameter)
                         rt_pin_write(PC13_SPEAKER_CTRL, PIN_HIGH);
                         if((10 != lct.lreg.btn.button_gn))
                         { 
-                            vcno = 0x5A + 39;/* 语音功能开启 */
+                            vcno = 0x5A + 39;/* 语音功能开�*/
                             rt_device_write(dev_xtp, 0, &vcno, sizeof(vcno)); 
                             rt_thread_delay(RT_TICK_PER_SECOND);
                         }                        
