@@ -34,6 +34,9 @@
 
 /* Using Software Timer */
 /* #define RT_USING_TIMER_SOFT */
+#define RT_TIMER_THREAD_PRIO		4
+#define RT_TIMER_THREAD_STACK_SIZE	512
+#define RT_TIMER_TICK_PER_SECOND	10
 
 /* Using independent hardware Timer, the channel and mode set of the timer is in drv_hwtimer.h*/
 //#define RT_USING_HWTIMER  /*hardware timer driver switch*/
@@ -53,9 +56,6 @@
 //#define RT_USING_HWTIM_CC_IRQ /* the capture or compare interrupt */
 #define RT_USING_HWTIM_UP_IRQ /* the update interrupt */
 
-#define RT_TIMER_THREAD_PRIO		4
-#define RT_TIMER_THREAD_STACK_SIZE	512
-#define RT_TIMER_TICK_PER_SECOND	10
 
 /* SECTION: IPC */
 /* Using Semaphore*/
@@ -115,7 +115,6 @@
 /* Using symbol table */
 #define FINSH_USING_SYMTAB
 #define FINSH_USING_DESCRIPTION
-
 
 /*#define RT_USING_CAN*/
 #define RT_CAN_USING_BUS_HOOK
@@ -192,8 +191,9 @@
 #define RT_LWIP_TCP_WND		8192
 
 /* SECTION: RT-Thread/GUI */
-/* #define RT_USING_RTGUI */
+#define RT_USING_LCD_XXX
 
+/* #define RT_USING_RTGUI */
 /* name length of RTGUI object */
 #define RTGUI_NAME_MAX		12
 /* support 16 weight font */

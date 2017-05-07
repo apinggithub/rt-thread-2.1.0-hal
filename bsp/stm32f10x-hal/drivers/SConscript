@@ -12,7 +12,7 @@ drv_led.c
 drv_usart.c
 cvt.c
 """)
-
+	
 if GetDepend(['RT_USING_PIN']):
     src += ['drv_gpio.c']
 	
@@ -40,21 +40,24 @@ if GetDepend('RT_USING_CAN'):
 if GetDepend('RT_USING_LWIP'):
     src += ['dm9000a.c']
 
-# add Ethernet drivers.
+# add file system drivers.
 if GetDepend('RT_USING_DFS'):
     src += ['sdcard.c']
 
-# add Ethernet drivers.
+# add RTC drivers.
 if GetDepend('RT_USING_RTC'):
     src += ['rtc.c']
 
-# add Ethernet drivers.
+# add LCD drivers.
 if GetDepend('RT_USING_RTGUI'):
     src += ['touch.c']
     if rtconfig.RT_USING_LCD_TYPE == 'ILI932X':
         src += ['ili_lcd_general.c']
     elif rtconfig.RT_USING_LCD_TYPE == 'SSD1289':
         src += ['ssd1289.c']
+		
+if GetDepend(['RT_USING_LCD_XXX']):
+    src += ['drv_lcd_xxx.c']
 
     
 CPPPATH = [cwd]

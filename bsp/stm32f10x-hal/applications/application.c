@@ -20,7 +20,7 @@
 
 #include <board.h>
 #include <rtthread.h>
-
+#include "drv_lcd_xxx.h"
 
 #ifdef  RT_USING_COMPONENTS_INIT
 #include <components.h>
@@ -61,6 +61,12 @@ static void led_thread_entry(void* parameter)
     //rt_pin_mode(PC15, PIN_MODE_OUTPUT);
     //rt_pin_mode(PB3, PIN_MODE_OUTPUT);
     //rt_pin_mode(PB4, PIN_MODE_OUTPUT);
+	
+	#ifdef RT_USING_LCD_XXX
+	stm32_hw_lcd_init();
+	LCD_Clear(GREEN);
+	LCD_Fill(50,60,100,120,RED);
+	#endif	
     
     while (1)
     {
@@ -130,6 +136,8 @@ void rt_init_thread_entry(void* parameter)
     else
         rt_kprintf("File System initialzation failed!\n");
 #endif  /* RT_USING_DFS */
+	
+
 
 #ifdef RT_USING_RTGUI
     {
