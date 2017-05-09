@@ -41,7 +41,8 @@
 
 /////////////////////////////////////用户配置区///////////////////////////////////	 
 //以下2个宏定义，定义屏幕的显示方式及IO速度
-#define USE_HORIZONTAL  0	//定义是否使用横屏 		0,不使用.1,使用.
+//#define LCD_USING_HORIZONTAL  	//定义是否使用横屏 		
+//#define LCD_USING_DATA_WTDTH_8BIT	//lcd 数据宽度
 
 //////////////////////////////////////////////////////////////////////////////////	 
 
@@ -51,12 +52,12 @@
 extern uint16_t  POINT_COLOR;//默认红色    
 extern uint16_t  BACK_COLOR; //背景颜色.默认为白色
 //定义LCD的尺寸
-#if USE_HORIZONTAL==1	//使用横屏
-#define LCD_W 320
-#define LCD_H 240
+#ifdef LCD_USING_HORIZONTAL	//使用横屏
+#define LCD_WIDTH 320
+#define LCD_HIGHT 240
 #else
-#define LCD_W 240
-#define LCD_H 320
+#define LCD_WITH 240
+#define LCD_HIGHT 320
 #endif
 ////////////////////////////////////////////////////////////////////
 //-----------------LCD端口定义---------------- 
@@ -92,7 +93,7 @@ extern uint16_t  BACK_COLOR; //背景颜色.默认为白色
 								    								    
 
 //PB0~15,作为数据线
-#define DATAOUT(x) GPIOB->ODR=x; //数据输出
+#define DATAOUT(x) GPIOB->ODR = x; //数据输出
 #define DATAIN     GPIOB->IDR;   //数据输入
 //////////////////////////////////////////////////////////////////////
 //扫描方向定义
@@ -113,46 +114,49 @@ extern uint16_t  BACK_COLOR; //背景颜色.默认为白色
 #define WHITE         	 0xFFFF
 #define BLACK         	 0x0000	  
 #define BLUE         	 0x001F  
-#define BRED             0XF81F
-#define GRED 			 0XFFE0
-#define GBLUE			 0X07FF
+#define BRED             0xF81F
+#define GRED 			 0xFFE0
+#define GBLUE			 0x07FF
 #define RED           	 0xF800
 #define MAGENTA       	 0xF81F
 #define GREEN         	 0x07E0
 #define CYAN          	 0x7FFF
 #define YELLOW        	 0xFFE0
-#define BROWN 			 0XBC40 //棕色
-#define BRRED 			 0XFC07 //棕红色
-#define GRAY  			 0X8430 //灰色
+#define BROWN 			 0xBC40 //棕色
+#define BRRED 			 0xFC07 //棕红色
+#define GRAY  			 0x8430 //灰色
 //GUI颜色
 
-#define DARKBLUE      	 0X01CF	//深蓝色
-#define LIGHTBLUE      	 0X7D7C	//浅蓝色  
-#define GRAYBLUE       	 0X5458 //灰蓝色
+#define DARKBLUE      	 0x01CF	//深蓝色
+#define LIGHTBLUE      	 0x7D7C	//浅蓝色  
+#define GRAYBLUE       	 0x5458 //灰蓝色
 //以上三色为PANEL的颜色 
  
-#define LIGHTGREEN     	 0X841F //浅绿色
-//#define LIGHTGRAY        0XEF5B //浅灰色(PANNEL)
-#define LGRAY 			 0XC618 //浅灰色(PANNEL),窗体背景色
+#define LIGHTGREEN     	 0x841F //浅绿色
+//#define LIGHTGRAY        0xEF5B //浅灰色(PANNEL)
+#define LGRAY 			 0xC618 //浅灰色(PANNEL),窗体背景色
 
-#define LGRAYBLUE        0XA651 //浅灰蓝色(中间层颜色)
-#define LBBLUE           0X2B12 //浅棕蓝色(选择条目的反色)
+#define LGRAYBLUE        0xA651 //浅灰蓝色(中间层颜色)
+#define LBBLUE           0x2B12 //浅棕蓝色(选择条目的反色)
+
 
 void LCD_WR_REG(uint8_t data);
-uint16_t LCD_Read_Point(void);
+void LCD_WR_DATA(uint16_t data);
+uint16_t LCD_RD_DATA(void);
 
+uint16_t LCD_Read_Point(void);
 extern uint16_t BACK_COLOR, POINT_COLOR ;  
-void stm32_hw_lcd_init(void);
+
 void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
 void LCD_Clear(uint16_t Color);	 
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void LCD_Scan_Dir(uint8_t dir);
-void LCD_DrawPoint(uint16_t x,uint16_t y);//画点
-//uint16_t  LCD_ReadPoint(uint16_t x,uint16_t y); //读点
-void Draw_Circle(uint16_t x0,uint16_t y0,uint8_t r);
-void LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);		   
+void LCD_SetPointPixel(uint16_t x,uint16_t y, uint16_t color);//画点
+uint16_t  LCD_GetPointPixel(uint16_t x,uint16_t y); //读点
+void Draw_Circle(uint16_t x0,uint16_t y0,uint8_t r, uint16_t color);
+void LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);		   
 void LCD_Fill(uint16_t sx,uint16_t sy,uint16_t ex,uint16_t ey,uint16_t color);
 void LCD_ShowChar(uint16_t x,uint16_t y,uint8_t num,uint8_t size,uint8_t mode);//显示一个字符
 void LCD_ShowNum(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uint8_t size);  //显示一个数字
@@ -166,7 +170,8 @@ void LCD_WriteRAM_Prepare(void);
 void LCD_WriteRAM(uint16_t RGB_Code);
 uint16_t LCD_ReadRAM(void);		   
 uint16_t LCD_BGR2RGB(uint16_t c);
-	
+
+int rt_hw_lcd_init(void);	
 
 //9320/9325 LCD寄存器  
 #define R0             0x00

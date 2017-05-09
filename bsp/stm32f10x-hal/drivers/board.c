@@ -220,7 +220,7 @@ void rt_hw_board_init()
     /* Configure the system clock @ 72 Mhz */
     SystemClock_Config();
 		
-		__CRC_CLK_ENABLE();
+	__CRC_CLK_ENABLE();
     hw_usart_init();
 	
 #ifdef RT_USING_HEAP

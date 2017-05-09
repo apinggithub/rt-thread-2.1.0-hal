@@ -191,9 +191,11 @@
 #define RT_LWIP_TCP_WND		8192
 
 /* SECTION: RT-Thread/GUI */
+#define RT_USING_STEMWIN
 #define RT_USING_LCD_XXX
 
-/* #define RT_USING_RTGUI */
+/* #define RT_USING_RTGUI //(RT_USING_GUIENGINE) */
+
 /* name length of RTGUI object */
 #define RTGUI_NAME_MAX		12
 /* support 16 weight font */

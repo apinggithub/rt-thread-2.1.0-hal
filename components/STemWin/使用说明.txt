@@ -1,0 +1,15 @@
+如果需要加载STemWin组件，
+1，在rtconfig.h中加入 #define RT_USING_STEMWIN
+
+2，在rtconfig.py中 
+
+如果MCU是STM32F10x_HD(flash容量在256K以上)，那么修改
+
+PART_TYPE = 'STM32F10X_HD'
+
+如果MCU是STM32F40x_HD(flash容量在256K以上)，那么修改
+
+PART_TYPE = 'STM32F40X_HD'
+
+3，配置完成后，重新运行generate_Keil_project.bat生成工程(例如KeilMDK)
+

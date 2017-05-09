@@ -1,0 +1,29 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+#cwd= GetCurrentDir()
+
+# The set of source files associated with this SConscript file.
+src = Split("""
+Config/GUIConf.c
+Config/GUIDRV.c
+Config/LCDConf_FlexColor.c
+OS/GUI_X_OS.c
+STemWinGUI_App.c
+""")
+#Lib/STemWin528_CM4_OS_Keil_ot.lib
+#CPPPATH = [cwd + '/inc']
+# The set of source files associated with this SConscript file.
+if rtconfig.PART_TYPE == 'STM32F10X_HD':
+    src += ['Lib/STemWin528_CM3_OS_Keil.lib']
+elif rtconfig.PART_TYPE == 'STM32F40X_HD':
+    src += ['Lib/STemWin528_CM4_OS_Keil.lib']	
+	
+path = [RTT_ROOT + '/components/STemWin/Config', RTT_ROOT + '/components/STemWin/inc',RTT_ROOT + '/components/Lib',RTT_ROOT + '/components/OS']
+
+CPPDEFINES = []
+
+group = DefineGroup('StemWin', src, depend = ['RT_USING_STEMWIN'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('group')

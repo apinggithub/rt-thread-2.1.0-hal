@@ -63,9 +63,11 @@ static void led_thread_entry(void* parameter)
     //rt_pin_mode(PB4, PIN_MODE_OUTPUT);
 	
 	#ifdef RT_USING_LCD_XXX
-	stm32_hw_lcd_init();
-	LCD_Clear(GREEN);
-	LCD_Fill(50,60,100,120,RED);
+	//stm32_hw_lcd_init();
+	//LCD_Clear(GREEN);
+	//LCD_Fill(0,0,100,50,RED);
+	//Draw_Circle(100,200,50,BRED);
+	//LCD_DrawLine(0,0,200,300,BLACK);
 	#endif	
     
     while (1)
