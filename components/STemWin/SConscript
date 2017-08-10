@@ -8,13 +8,19 @@ from building import *
 src = Split("""
 Config/GUIConf.c
 Config/GUIDRV.c
-Config/LCDConf_FlexColor.c
 OS/GUI_X_OS.c
 STemWinGUI_App.c
 """)
 #Lib/STemWin528_CM4_OS_Keil_ot.lib
 #CPPPATH = [cwd + '/inc']
 # The set of source files associated with this SConscript file.
+
+if GetDepend('RT_USING_SPI_LCD'):
+    src += ['Config/LCDConf_Lin.c']
+if GetDepend('RT_USING_IIC_TOUCH_FT5216'):
+    src += ['Config/GUI_TOUCH_Analog.c']
+elif GetDepend('RT_USING_FSMC_LCD'):
+    src += ['Config/LCDConf_FlexColor.c']
 if rtconfig.PART_TYPE == 'STM32F10X_HD':
     src += ['Lib/STemWin528_CM3_OS_Keil.lib']
 elif rtconfig.PART_TYPE == 'STM32F40X_HD':

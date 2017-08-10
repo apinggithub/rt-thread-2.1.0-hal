@@ -57,8 +57,8 @@ Purpose     : Template driver, could be used as starting point for new
 #include "LCD_Private.h"
 #include "GUI_Private.h"
 #include "LCD_ConfDefaults.h"
-#include "drv_lcd_xxx.h"
-
+//#include "drv_fsmc_lcd.h"
+#include "drv_lcd_ili9341.h"
 /*********************************************************************
 *
 *       Defines
@@ -160,7 +160,10 @@ static void _SetPixelIndex(GUI_DEVICE * pDevice, int x, int y, int PixelIndex) {
       //
       // TBD by customer...
       //
-	  LCD_SetPointPixel(xPhys, yPhys, PixelIndex);	
+	  //LCD_SetPointPixel(xPhys, yPhys, PixelIndex);	
+			#ifdef RT_USING_LCD_ILI9341
+			ili9341_draw_pixel((uint16_t)xPhys, (uint16_t)yPhys, (uint16_t)PixelIndex);
+			#endif
     }
     #if (LCD_MIRROR_X == 0) && (LCD_MIRROR_Y == 0) && (LCD_SWAP_XY == 0)
       #undef xPhys
@@ -200,7 +203,9 @@ static unsigned int _GetPixelIndex(GUI_DEVICE * pDevice, int x, int y) {
       //
       // TBD by customer...
       //
-      PixelIndex = LCD_GetPointPixel(xPhys, yPhys);		
+			#ifdef RT_USING_LCD_ILI9341
+      PixelIndex = ili9341_get_pixel(xPhys, yPhys);	
+			#endif			
     }
     #if (LCD_MIRROR_X == 0) && (LCD_MIRROR_Y == 0) && (LCD_SWAP_XY == 0)
       #undef xPhys

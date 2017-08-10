@@ -20,7 +20,6 @@
 
 #include <board.h>
 #include <rtthread.h>
-#include "drv_lcd_xxx.h"
 
 #ifdef  RT_USING_COMPONENTS_INIT
 #include <components.h>
@@ -43,35 +42,58 @@
 
 #include "drv_led.h"
 #include "drv_gpio.h"
-#include "drv_hwbutton.h"
-#include "light_wave_curer.h"
-
+//#include "drv_hwbutton.h"
+//#include "light_wave_curer.h"
+#include "drv_lcd_ili9341.h"
+#include "drv_iic_touch_ft5216.h"
+#include "drv_stm32f10x_spi.h"
+#include "spi_flash_w25qxx.h"
+//#include "bsp_EEPROM.h"
 
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t led_stack[ 256 ];
+static rt_uint8_t led_stack[1024];
 static struct rt_thread led_thread;
 
+extern int rt_hw_lcd_init(void);
+//extern uint8_t ft5216_rcv[];
+uint16_t lcdid;
+uint16_t ft5216id;
 static void led_thread_entry(void* parameter)
 {
+	
     //unsigned int count=0;
+	
     rt_led_hw_init();
     
-    //rt_pin_mode(PC13, PIN_MODE_OUTPUT);
+    //rt_pin_mode(PB1, PIN_MODE_OUTPUT);
+	  //rt_pin_mode(PC8,PIN_MODE_OUTPUT);//pc8
+		//rt_pin_mode(PC9,PIN_MODE_OUTPUT);//pc9
+		//rt_pin_mode(PC7,PIN_MODE_INPUT);//pc7
+		//rt_pin_write(PC9,PIN_HIGH);
     //rt_pin_mode(PC14, PIN_MODE_OUTPUT);
     //rt_pin_mode(PC15, PIN_MODE_OUTPUT);
     //rt_pin_mode(PB3, PIN_MODE_OUTPUT);
     //rt_pin_mode(PB4, PIN_MODE_OUTPUT);
-	
-	#ifdef RT_USING_LCD_XXX
-	//stm32_hw_lcd_init();
-	//LCD_Clear(GREEN);
+#if 1	
+	#ifdef RT_USING_LCD_ILI9341
+	rt_hw_lcd_init();
+	lcdid = ili9341_read_id();
+	//if(0x9341 == lcdid)
+	//rt_hw_lcd_init();
+	ili9341_screen_clear(RED);
+	ft5216id = ft5216_ReadID();
+	//CTP_IO_Read(0,ft5216_rcv,8); 
+	//LCD_Clear();
+	 //ili9341_DrawLine(0,8,100,108,GREEN);
 	//LCD_Fill(0,0,100,50,RED);
-	//Draw_Circle(100,200,50,BRED);
-	//LCD_DrawLine(0,0,200,300,BLACK);
+	//Draw_Circle(100,200,50,BRED);	
+#endif
 	#endif	
     
     while (1)
     {
+		//ili9341_screen_clear(RED);
+		
         /* led1 on */
 #ifndef RT_USING_FINSH
         rt_kprintf("led on, count : %d\r\n",count);
@@ -81,7 +103,8 @@ static void led_thread_entry(void* parameter)
         rt_led_on();			
         rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
 
-		//rt_pin_toggle(PC13);
+		    //rt_pin_toggle(PB1);
+				
         //rt_pin_toggle(PC14);
         //rt_pin_toggle(PC15);
         //rt_pin_toggle(PB3);
@@ -117,26 +140,44 @@ void cali_store(struct calibration_data *data)
 
 void rt_init_thread_entry(void* parameter)
 {
+#ifdef RT_USING_SPI
+	//rt_platform_init();
+#endif
 #ifdef RT_USING_COMPONENTS_INIT
     /* initialization RT-Thread Components */
     rt_components_init();
 #endif
-
+	
 #ifdef RT_USING_PIN    
     
   	stm32_hw_pin_init();  
     
-#endif /* RT_USING_PIN */          
-    
+#endif /* RT_USING_PIN */ 
+	
+ #ifdef RT_USING_SPI_FLASH
+	  w25qxx_init("sd0", "spiflash");
+	
+#endif  
+  
     /* Filesystem Initialization */
 #if defined(RT_USING_DFS) && defined(RT_USING_DFS_ELMFAT)
+	/* initialize the device file system */
+		dfs_init();
+
+		/* initialize the elm chan FatFS file system*/
+		elm_init();
+		
     /* mount sd card fat partition 1 as root directory */
     if (dfs_mount("sd0", "/", "elm", 0, 0) == 0)
     {
         rt_kprintf("File System initialized!\n");
     }
     else
+		{
         rt_kprintf("File System initialzation failed!\n");
+		    
+		}
+		//dfs_mkfs("elm","sd0");
 #endif  /* RT_USING_DFS */
 	
 
@@ -253,7 +294,7 @@ int rt_application_init(void)
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
-                                   2048, 8, 20);
+                                   1024, 8, 20);
 #else
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,

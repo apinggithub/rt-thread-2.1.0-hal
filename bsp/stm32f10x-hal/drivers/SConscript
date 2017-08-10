@@ -11,6 +11,7 @@ stm32f1xx_it.c
 drv_led.c
 drv_usart.c
 cvt.c
+platform.c
 """)
 	
 if GetDepend(['RT_USING_PIN']):
@@ -31,19 +32,31 @@ if GetDepend(['RT_USING_LCDHT1621B']):
 	
 if GetDepend(['RT_USING_XT8XXP8']):
     src = src + ['drv_xt8xxp8.c']	
+# add WIFI Ethernet drivers.	
+if GetDepend('RT_USING_UART_WIFI_ESP8266'):
+	src += ['usart_wifi_esp8266.c']	
+# add WIFI Ethernet drivers.	
+if GetDepend('RT_USING_FINGERPRINT'):
+	src += ['drv_usart_finger.c']		
 	
 # add canbus driver.
 if GetDepend('RT_USING_CAN'):
     src += ['bxcan.c']
 
 # add Ethernet drivers.
-if GetDepend('RT_USING_LWIP'):
-    src += ['dm9000a.c']
+#if GetDepend('RT_USING_LWIP'):
+#	src += ['dm9000a.c']
 
+# add WIFI Ethernet drivers.	
+if GetDepend('RT_USING_ESP12F'):
+	src += ['usart_wifi_esp12f.c']
+	
 # add file system drivers.
-if GetDepend('RT_USING_DFS'):
-    src += ['sdcard.c']
-
+#if GetDepend('RT_USING_DFS'):
+    #src += ['sdcard.c']
+# add file system drivers.
+if GetDepend('RT_USING_SPI'):
+    src += ['drv_stm32f10x_spi.c']
 # add RTC drivers.
 if GetDepend('RT_USING_RTC'):
     src += ['rtc.c']
@@ -56,9 +69,15 @@ if GetDepend('RT_USING_RTGUI'):
     elif rtconfig.RT_USING_LCD_TYPE == 'SSD1289':
         src += ['ssd1289.c']
 		
-if GetDepend(['RT_USING_LCD_XXX']):
-    src += ['drv_lcd_xxx.c']
-
+if GetDepend(['RT_USING_FSMC_LCD']):
+    src += ['drv_fsmc_lcd.c']
+if GetDepend(['RT_USING_SPI_LCD']):
+    src += ['drv_spi_lcd.c']		
+if GetDepend(['RT_USING_LCD_ILI9341']):
+    src += ['drv_lcd_ili9341.c']
+if GetDepend(['RT_USING_IIC_TOUCH_FT5216']):
+    src += ['drv_iic_touch_ft5216.c']
+	
     
 CPPPATH = [cwd]
 

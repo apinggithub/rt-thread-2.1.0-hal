@@ -451,7 +451,7 @@ static void RCC_APB2PeriphClockCmd(GPIO_TypeDef *gpio, FunctionalState NewState)
   if (NewState != DISABLE)
   {
     //RCC->APB2ENR |= RCC_APB2Periph;
-#if (RT_USING_PIN_NUMBERS == 64)
+#if (RT_USING_PIN_NUMBERS >= 64)
 		if(GPIOA == gpio)		
 				__HAL_RCC_GPIOA_CLK_ENABLE();
 		if(GPIOB == gpio)			
@@ -461,7 +461,7 @@ static void RCC_APB2PeriphClockCmd(GPIO_TypeDef *gpio, FunctionalState NewState)
 		if(GPIOD == gpio)
 				__HAL_RCC_GPIOD_CLK_ENABLE();
 #endif
-#if (RT_USING_PIN_NUMBERS == 100)
+#if (RT_USING_PIN_NUMBERS >= 100)
 		if(GPIOE == gpio)		
 				__HAL_RCC_GPIOE_CLK_ENABLE();
 #endif		
@@ -475,7 +475,7 @@ static void RCC_APB2PeriphClockCmd(GPIO_TypeDef *gpio, FunctionalState NewState)
   else
   {
     //RCC->APB2ENR &= ~RCC_APB2Periph;	
-#if (RT_USING_PIN_NUMBERS == 64)		
+#if (RT_USING_PIN_NUMBERS >= 64)		
 		if(GPIOA == gpio)		
 				__HAL_RCC_GPIOA_CLK_DISABLE();
 		else if(GPIOB == gpio)			
@@ -485,7 +485,7 @@ static void RCC_APB2PeriphClockCmd(GPIO_TypeDef *gpio, FunctionalState NewState)
 		else if(GPIOD == gpio)
 				__HAL_RCC_GPIOD_CLK_DISABLE();
 #endif			
-#if (RT_USING_PIN_NUMBERS == 100)
+#if (RT_USING_PIN_NUMBERS >= 100)
 		if(GPIOE == gpio)		
 				__HAL_RCC_GPIOE_CLK_DISABLE();
 #endif		

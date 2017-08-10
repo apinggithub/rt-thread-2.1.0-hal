@@ -53,8 +53,8 @@ Purpose     : Display controller configuration (single layer)
 
 #include "GUI.h"
 #include "GUIDRV_FlexColor.h"
-#include "drv_lcd_xxx.h"
-
+#include "drv_fsmc_lcd.h"
+#include "drv_lcd_ili9341.h"
 /*********************************************************************
 *
 *       Layer configuration (to be modified)
@@ -74,6 +74,8 @@ Purpose     : Display controller configuration (single layer)
 *
 **********************************************************************
 */
+#define LCD_USING_DATA_WTDTH_16BIT
+
 #ifndef   VXSIZE_PHYS
   #define VXSIZE_PHYS XSIZE_PHYS
 #endif
@@ -106,11 +108,18 @@ Purpose     : Display controller configuration (single layer)
 * Function description:
 *   Sets display register
 */
-static void LcdWriteReg(U16 Data) {
+#ifdef LCD_USING_DATA_WTDTH_8BIT //使用8位并行数据总线模式  
+static void LcdWriteReg8(U8 cmd) {
   // ... TBD by user
-  LCD_WR_REG(Data);
+  ili9341_write_cmd(cmd);
+} 
+#endif
+#ifdef LCD_USING_DATA_WTDTH_16BIT //使用16位并行数据总线模式
+static void LcdWriteReg16(U16 Cmd) {
+  // ... TBD by user
+  LCD_WRITE_CMD(Cmd);
 }
-
+#endif
 /********************************************************************
 *
 *       LcdWriteData
@@ -118,11 +127,18 @@ static void LcdWriteReg(U16 Data) {
 * Function description:
 *   Writes a value to a display register
 */
-static void LcdWriteData(U16 Data) {
+#ifdef LCD_USING_DATA_WTDTH_8BIT //使用8位并行数据总线模式
+static void LcdWriteData8(U8 Data) {
   // ... TBD by user
-  LCD_WR_DATA(Data);
-
+  ili9341_write_data(Data);
 }
+#endif
+#ifdef LCD_USING_DATA_WTDTH_16BIT //使用16位并行数据总线模式
+static void LcdWriteData16(U16 Data) {
+  // ... TBD by user
+  LCD_WRITE_DATA(Data);
+}
+#endif
 /********************************************************************
 *
 *       LcdWriteDataMultiple
@@ -130,13 +146,24 @@ static void LcdWriteData(U16 Data) {
 * Function description:
 *   Writes multiple values to a display register.
 */
-static void LcdWriteDataMultiple(U16 * pData, int NumItems) {
+#ifdef LCD_USING_DATA_WTDTH_8BIT //使用8位并行数据总线模式
+static void LcdWriteDataMultiple8(U8 * pData, int NumItems) {
   while (NumItems--) {
     // ... TBD by user
-	LCD_WR_DATA(*pData);
+	ili9341_write_data(*pData);
 	pData++;
   }
 }
+#endif
+#ifdef LCD_USING_DATA_WTDTH_16BIT //使用8位并行数据总线模式
+static void LcdWriteDataMultiple16(U16 * pData, int NumItems) {
+  while (NumItems--) {
+    // ... TBD by user
+	LCD_WRITE_DATA(*pData);
+	pData++;
+  }
+}
+#endif
 
 /********************************************************************
 *
@@ -145,14 +172,24 @@ static void LcdWriteDataMultiple(U16 * pData, int NumItems) {
 * Function description:
 *   Reads multiple values from a display register.
 */
-static void LcdReadDataMultiple(U16 * pData, int NumItems) {
+#ifdef LCD_USING_DATA_WTDTH_8BIT //使用8位并行数据总线模式
+static void LcdReadDataMultiple8(U8 * pData, int NumItems) {
   while (NumItems--) {
     // ... TBD by user
-	*pData = LCD_RD_DATA();
+	*pData = ili9341_read_data();
 	pData++;
   }
 }
-
+#endif
+#ifdef LCD_USING_DATA_WTDTH_16BIT //使用16位并行数据总线模式
+static void LcdReadDataMultiple16(U16 * pData, int NumItems) {
+  while (NumItems--) {
+    // ... TBD by user
+	*pData = LCD_READ_DATA();
+	pData++;
+  }
+}
+#endif
 /*********************************************************************
 *
 *       Public functions
@@ -189,11 +226,22 @@ void LCD_X_Config(void) {
   //
   // Set controller and operation mode
   //
-  PortAPI.pfWrite16_A0  = LcdWriteReg;
-  PortAPI.pfWrite16_A1  = LcdWriteData;
-  PortAPI.pfWriteM16_A1 = LcdWriteDataMultiple;
-  PortAPI.pfReadM16_A1  = LcdReadDataMultiple;
+  #ifdef LCD_USING_DATA_WTDTH_8BIT //使用8位并行数据总线模式
+  PortAPI.pfWrite8_A0  = LcdWriteReg8;
+  PortAPI.pfWrite8_A1  = LcdWriteData8;
+  PortAPI.pfWriteM8_A1 = LcdWriteDataMultiple8;
+  PortAPI.pfReadM8_A1  = LcdReadDataMultiple8;
+  GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B8);
+  #endif
+  
+  #ifdef LCD_USING_DATA_WTDTH_16BIT //使用16位并行数据总线模式
+  PortAPI.pfWrite16_A0  = LcdWriteReg16;
+  PortAPI.pfWrite16_A1  = LcdWriteData16;
+  PortAPI.pfWriteM16_A1 = LcdWriteDataMultiple16;
+  PortAPI.pfReadM16_A1  = LcdReadDataMultiple16;
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B16);
+  #endif
+  
 }
 
 /*********************************************************************

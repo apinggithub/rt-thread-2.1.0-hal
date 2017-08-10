@@ -22,8 +22,8 @@
 struct spi_flash_device
 {
     struct rt_device                flash_device;
-    struct rt_device_blk_geometry   geometry;
-    struct rt_spi_device *          rt_spi_device;
+	  struct rt_spi_device *          rt_spi_device;
+    struct rt_device_blk_geometry   geometry;    
     struct rt_mutex                 lock;
 };
 

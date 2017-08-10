@@ -30,6 +30,8 @@
 
 #pragma pack(1)
 
+#define RT_USB_MSTORAGE_DISK_NAME "LZT_USB"
+
 struct umass_descriptor
 {
     struct uinterface_descriptor intf_desc;

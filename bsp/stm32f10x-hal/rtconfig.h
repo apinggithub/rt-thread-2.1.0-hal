@@ -96,11 +96,17 @@
 
 #define RT_USING_UART1
 #define RT_USING_UART2
-/* #define RT_USING_UART3 */
+#define RT_USING_UART3
+/*SECTION: fingerprint mode*/
+#define RT_USING_FINGERPRINT
+/* SECTION: WIFI mode */
+#define RT_USING_UART_WIFI_ESP8266/* WIFI mode ESP8266*/
+
+
 
 /*Using Pin select as device*/
 #define RT_USING_PIN
-#define RT_USING_PIN_NUMBERS        64 /*[ 64, 100, 144 ] */
+#define RT_USING_PIN_NUMBERS        100 /*[ 64, 100, 144 ] */
 
 /* SECTION: Console options */
 #define RT_USING_CONSOLE
@@ -109,6 +115,9 @@
 // <string name="RT_CONSOLE_DEVICE_NAME" description="The device name for console" default="uart1" />
 // if you use the console, and you need to configure the 'STM32_CONSOLE_USART' in board.h .
 #define RT_CONSOLE_DEVICE_NAME	    "uart1"
+
+
+
 
 /* SECTION: finsh, a C-Express shell */
 #define RT_USING_FINSH
@@ -119,27 +128,76 @@
 /*#define RT_USING_CAN*/
 #define RT_CAN_USING_BUS_HOOK
 #define RT_CAN_USING_HDR
-/* SECTION: device filesystem */
-/* #define RT_USING_DFS */
 
+#define RT_USING_SPI
+#define RT_USING_SPI1
+#define RT_USING_W25QXX
+#define RT_USING_SPI_FLASH
+
+/* SECTION: device filesystem */
+#define RT_USING_DFS
 #define RT_USING_DFS_ELMFAT
 /* Reentrancy (thread safe) of the FatFs module.  */
 #define RT_DFS_ELM_REENTRANT
 /* Number of volumes (logical drives) to be used. */
-#define RT_DFS_ELM_DRIVES			2
+#define RT_DFS_ELM_DRIVES			1
 /* #define RT_DFS_ELM_USE_LFN			1 */
 /* #define RT_DFS_ELM_CODE_PAGE			936 */
 #define RT_DFS_ELM_MAX_LFN			255
 /* Maximum sector size to be handled. */
-#define RT_DFS_ELM_MAX_SECTOR_SIZE  512
+#define RT_DFS_ELM_MAX_SECTOR_SIZE  4096
 
 /* the max number of mounted filesystem */
 #define DFS_FILESYSTEMS_MAX			2
 /* the max number of opened files 		*/
 #define DFS_FD_MAX					4
 
+
+#define RT_USING_USB_DEVICE
+#define RT_USB_DEVICE_MSTORAGE
+
+
+
+/* SECTION: STemWin GUI */
+//#define RT_USING_SPI_LCD
+#define RT_USING_FSMC_LCD //fsmc data bus
+#define RT_USING_LCD_ILI9341
+#define RT_USING_IIC_TOUCH_FT5216
+#define RT_USING_STEMWIN
+
+
+
+/* SECTION: RT-Thread/GUI */
+/* #define RT_USING_RTGUI //(RT_USING_GUIENGINE) */
+
+/* name length of RTGUI object */
+#define RTGUI_NAME_MAX		12
+/* support 16 weight font */
+#define RTGUI_USING_FONT16
+/* support Chinese font */
+#define RTGUI_USING_FONTHZ
+/* use DFS as file interface */
+#define RTGUI_USING_DFS_FILERW
+/* use font file as Chinese font */
+#define RTGUI_USING_HZ_FILE
+/* use Chinese bitmap font */
+#define RTGUI_USING_HZ_BMP
+/* use small size in RTGUI */
+#define RTGUI_USING_SMALL_SIZE
+/* use mouse cursor */
+/* #define RTGUI_USING_MOUSE_CURSOR */
+/* default font size in RTGUI */
+#define RTGUI_DEFAULT_FONT_SIZE	16
+
+/* image support */
+/* #define RTGUI_IMAGE_XPM */
+/* #define RTGUI_IMAGE_BMP */
+
+/* SECTION: WIFI mode */
+//#define RT_USING_ESP12F /* WIFI mode ESP-12F*/
+
 /* SECTION: lwip, a lighwight TCP/IP protocol stack */
-/* #define RT_USING_LWIP */
+#define RT_USING_LWIP 
 /* LwIP uses RT-Thread Memory Management */
 #define RT_LWIP_USING_RT_MEM
 /* Enable ICMP protocol*/
@@ -189,35 +247,6 @@
 #define RT_LWIP_TCP_SND_BUF	8192
 /* TCP receive window. */
 #define RT_LWIP_TCP_WND		8192
-
-/* SECTION: RT-Thread/GUI */
-#define RT_USING_STEMWIN
-#define RT_USING_LCD_XXX
-
-/* #define RT_USING_RTGUI //(RT_USING_GUIENGINE) */
-
-/* name length of RTGUI object */
-#define RTGUI_NAME_MAX		12
-/* support 16 weight font */
-#define RTGUI_USING_FONT16
-/* support Chinese font */
-#define RTGUI_USING_FONTHZ
-/* use DFS as file interface */
-#define RTGUI_USING_DFS_FILERW
-/* use font file as Chinese font */
-#define RTGUI_USING_HZ_FILE
-/* use Chinese bitmap font */
-#define RTGUI_USING_HZ_BMP
-/* use small size in RTGUI */
-#define RTGUI_USING_SMALL_SIZE
-/* use mouse cursor */
-/* #define RTGUI_USING_MOUSE_CURSOR */
-/* default font size in RTGUI */
-#define RTGUI_DEFAULT_FONT_SIZE	16
-
-/* image support */
-/* #define RTGUI_IMAGE_XPM */
-/* #define RTGUI_IMAGE_BMP */
 
 // <bool name="RT_USING_CMSIS_OS" description="Using CMSIS OS API" default="true" />
 // #define RT_USING_CMSIS_OS

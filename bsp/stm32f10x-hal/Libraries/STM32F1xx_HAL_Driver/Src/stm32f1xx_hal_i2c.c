@@ -221,8 +221,8 @@
   * @{
   */
 #define I2C_TIMEOUT_FLAG          ((uint32_t)35)     /*!< Timeout 35 ms */
-#define I2C_TIMEOUT_ADDR_SLAVE    ((uint32_t)10000)  /*!< Timeout 10 s  */
-#define I2C_TIMEOUT_BUSY_FLAG     ((uint32_t)10000)  /*!< Timeout 10 s  */
+#define I2C_TIMEOUT_ADDR_SLAVE    ((uint32_t)1000)  /*!< Timeout 1 s  */
+#define I2C_TIMEOUT_BUSY_FLAG     ((uint32_t)1000)  /*!< Timeout 1 s  */
 /**
   * @}
   */ 
@@ -3906,6 +3906,7 @@ static void I2C_DMAError(DMA_HandleTypeDef *hdma)
 static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, FlagStatus Status, uint32_t Timeout)
 {
   uint32_t tickstart = 0;
+	uint32_t temp_timeout = Timeout;
 
   /* Get tick */
   tickstart = HAL_GetTick();
@@ -3918,7 +3919,7 @@ static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uin
       /* Check for the Timeout */
       if(Timeout != HAL_MAX_DELAY)
       {
-        if((Timeout == 0)||((HAL_GetTick() - tickstart ) > Timeout))
+        if((Timeout == 0)||((HAL_GetTick() - tickstart ) > temp_timeout))
         {
           hi2c->State= HAL_I2C_STATE_READY;
 
@@ -3937,7 +3938,7 @@ static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uin
       /* Check for the Timeout */
       if(Timeout != HAL_MAX_DELAY)
       {
-        if((Timeout == 0)||((HAL_GetTick() - tickstart ) > Timeout))
+        if((Timeout == 0)||((HAL_GetTick() - tickstart ) > temp_timeout))
         {
           hi2c->State= HAL_I2C_STATE_READY;
 

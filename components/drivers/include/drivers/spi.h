@@ -95,7 +95,6 @@ struct rt_spi_bus
 {
     struct rt_device parent;
     const struct rt_spi_ops *ops;
-
     struct rt_mutex lock;
     struct rt_spi_device *owner;
 };
@@ -116,7 +115,6 @@ struct rt_spi_device
 {
     struct rt_device parent;
     struct rt_spi_bus *bus;
-
     struct rt_spi_configuration config;
 };
 #define SPI_DEVICE(dev) ((struct rt_spi_device *)(dev))

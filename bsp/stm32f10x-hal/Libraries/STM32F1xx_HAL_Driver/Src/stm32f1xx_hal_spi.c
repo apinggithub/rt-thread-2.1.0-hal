@@ -193,7 +193,10 @@ static void SPI_DMAHalfReceiveCplt(DMA_HandleTypeDef *hdma);
 static void SPI_DMAHalfTransmitReceiveCplt(DMA_HandleTypeDef *hdma);
 static void SPI_DMAError(DMA_HandleTypeDef *hdma);
 static HAL_StatusTypeDef SPI_WaitOnFlagUntilTimeout(SPI_HandleTypeDef *hspi, uint32_t Flag, FlagStatus Status, uint32_t Timeout);
+
+
 /**
+
   * @}
   */
 
@@ -272,6 +275,7 @@ __weak HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
     
     /* Init the low level hardware : GPIO, CLOCK, NVIC... */
     HAL_SPI_MspInit(hspi);
+	 
   }
   
   hspi->State = HAL_SPI_STATE_BUSY;

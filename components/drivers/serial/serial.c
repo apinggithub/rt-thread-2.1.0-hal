@@ -515,6 +515,7 @@ rt_err_t rt_hw_serial_register(struct rt_serial_device *serial,
 }
 
 /* ISR for serial interrupt */
+
 void rt_hw_serial_isr(struct rt_serial_device *serial, int event)
 {
     switch (event & 0xff)
@@ -532,8 +533,8 @@ void rt_hw_serial_isr(struct rt_serial_device *serial, int event)
             while (1)
             {
                 ch = serial->ops->getc(serial);
-                if (ch == -1) break;
-
+                if (ch == -1) 
+									break;
                 
                 /* disable interrupt */
                 level = rt_hw_interrupt_disable();

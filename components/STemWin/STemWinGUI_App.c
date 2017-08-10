@@ -20,16 +20,23 @@ void emWin_thread_entry(void *parameter)
 	rt_kprintf("\nGUIINIT\n");
 
 	GUI_SetColor(GUI_WHITE); 
-	GUI_SetFont(GUI_FONT_8X16_ASCII);
+	GUI_SetFont(GUI_FONT_8X16_ASCII);	
+	
 	//GUI_DispStringAt(buff,0,0);
 	while(1)
 	{
-		
+		GUI_PID_STATE zuobiao;
 		//GUIDEMO_Main();
 		//rt_thread_delay(1000);
 		//MainTask();
-		GUI_DispStringAt("Hello World!", 30, 200);
-		
+		GUI_TOUCH_GetState(&zuobiao);
+		if ( 1 == zuobiao.Pressed)
+			GUI_DispStringAt("Hello World!", zuobiao.x,zuobiao.y);
+		else
+		{
+			GUI_SetBkColor(GUI_BLUE);
+			GUI_Clear();
+		}
 		rt_thread_delay(RT_TICK_PER_SECOND/10);
 	}
 }
@@ -37,9 +44,7 @@ void emWin_thread_entry(void *parameter)
 int emwin_system_init(void)
 {
 	rt_err_t result;
-	//
-
-	//GUI_X_InitOS();
+	//rt_thread_t emwin_thread1;
 	rt_device_t device = rt_device_find("lcd");
 	if(device == RT_NULL)
 	{
@@ -54,7 +59,7 @@ int emwin_system_init(void)
 		&emWin_thread_stack[0], sizeof(emWin_thread_stack),
 		21, 100);
 				
-		/*emwin_thread = rt_thread_create("emwin",
+		/*emwin_thread1 = rt_thread_create("emwin",
 						emWin_thread_entry,
 						 RT_NULL,
 						 RT_GUI_NUMBYTES,

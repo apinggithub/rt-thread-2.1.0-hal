@@ -63,6 +63,7 @@
 
 #ifndef RT_SERIAL_RB_BUFSZ
 #define RT_SERIAL_RB_BUFSZ              64
+#define RT_SERIAL_UART2_RB_BUFSZ        509
 #endif
 
 #define RT_SERIAL_EVENT_RX_IND          0x01    /* Rx indication */
@@ -106,7 +107,7 @@ struct serial_configure
     rt_uint32_t parity                  :2;
     rt_uint32_t bit_order               :1;
     rt_uint32_t invert                  :1;
-	rt_uint32_t bufsz					:16;
+		rt_uint32_t bufsz										:16;
     rt_uint32_t reserved                :4;
 };
 

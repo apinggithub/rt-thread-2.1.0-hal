@@ -27,7 +27,7 @@
 #define FLASH_TRACE(...)
 #endif /* #ifdef FLASH_DEBUG */
 
-#define PAGE_SIZE           4096
+#define PAGE_SIZE          4096
 
 /* JEDEC Manufacturer��s ID */
 #define MF_ID           (0xEF)
@@ -42,6 +42,8 @@
 #define MTC_W25Q64_BV_CV      (0x4017) /* W25Q64BV W25Q64CV */
 #define MTC_W25Q64_DW         (0x4017) /* W25Q64DW */
 #define MTC_W25Q128_BV        (0x4018) /* W25Q128BV */
+#define MTC_W25Q64_FV        	(0x6017)  /* W25Q64FV */
+#define MTC_W25Q128_FV        (0x4018)  /* W25Q128FV */
 #define MTC_W25Q256_FV        (TBD)    /* W25Q256FV */
 
 /* command list */
@@ -277,7 +279,7 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
         struct rt_spi_configuration cfg;
         cfg.data_width = 8;
         cfg.mode = RT_SPI_MODE_0 | RT_SPI_MSB; /* SPI Compatible: Mode 0 and Mode 3 */
-        cfg.max_hz = 50 * 1000 * 1000; /* 50M */
+        cfg.max_hz = 10 * 1000 * 1000; /* 2M */
         rt_spi_configure(spi_flash_device.rt_spi_device, &cfg);
     }
 
@@ -297,6 +299,8 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
 
         /* read flash id */
         cmd = CMD_JEDEC_ID;
+			//rt_spi_send(spi_flash_device.rt_spi_device, &cmd, 1);
+				//rt_spi_recv(spi_flash_device.rt_spi_device, id_recv, 3);
         rt_spi_send_then_recv(spi_flash_device.rt_spi_device, &cmd, 1, id_recv, 3);
 
         flash_unlock(&spi_flash_device);
@@ -308,14 +312,19 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
             return -RT_ENOSYS;
         }
 
-        spi_flash_device.geometry.bytes_per_sector = 4096;
-        spi_flash_device.geometry.block_size = 4096; /* block erase: 4k */
+        spi_flash_device.geometry.bytes_per_sector =4096; //4096;
+        spi_flash_device.geometry.block_size = 4096;//4096; /* block erase: 4k */
 
         /* get memory type and capacity */
         memory_type_capacity = id_recv[1];
         memory_type_capacity = (memory_type_capacity << 8) | id_recv[2];
 
-        if(memory_type_capacity == MTC_W25Q128_BV)
+        if(memory_type_capacity == MTC_W25Q128_FV)
+        {
+            FLASH_TRACE("W25Q128FV detection\r\n");
+            spi_flash_device.geometry.sector_count = 4096;
+        }
+				 else if(memory_type_capacity == MTC_W25Q128_BV)
         {
             FLASH_TRACE("W25Q128BV detection\r\n");
             spi_flash_device.geometry.sector_count = 4096;
@@ -355,13 +364,18 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
             FLASH_TRACE("W25Q80BV detection\r\n");
             spi_flash_device.geometry.sector_count = 256;
         }
+				else if(memory_type_capacity == MTC_W25Q64_FV)
+        {
+            FLASH_TRACE("MTC_W25X64_BV detection\r\n");
+            spi_flash_device.geometry.sector_count = 2048;
+				}
         else
         {
             FLASH_TRACE("Memory Capacity error!\r\n");
             return -RT_ENOSYS;
         }
     }
-
+		
     /* register device */
     spi_flash_device.flash_device.type    = RT_Device_Class_Block;
     spi_flash_device.flash_device.init    = w25qxx_flash_init;
@@ -375,6 +389,36 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
 
     rt_device_register(&spi_flash_device.flash_device, flash_device_name,
                        RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_STANDALONE);
+		
+		#if 1
+		 {
+			 //uint16_t i;
+			 
+			 uint8_t recv[256] = {0};
+			 #if 0
+			 uint8_t send[1024];
+			 for(i = 0;i < 255; i++)
+			 {
+				 send[i] = i;
+			 }
+			 send[54] = 0x46; 
+			 send[55] = 0x41;
+			 send[56] = 0x54;
+			 send[82] = 0x46;
+			 send[83] = 0x41;
+			 send[84] = 0x54;
+			 send[510] = 0x55;
+			 send[511] = 0xAA;
+			w25qxx_page_write(0x0000,send);
+			 //w25qxx_page_write(0x0100,send);
+			 #endif
+			 w25qxx_read(0x000,recv,256);
+			 
+		}
+		#endif
+		
+		
+		
 
     return RT_EOK;
 }

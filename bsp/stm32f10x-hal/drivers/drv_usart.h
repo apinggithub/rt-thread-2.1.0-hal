@@ -62,7 +62,25 @@
 
 #endif /* RT_USING_UART2 */
 
+#ifdef RT_USING_UART3
 
+/* Definition for USART1 clock resources */
+#define USART3_CLK_ENABLE()              __USART3_CLK_ENABLE()
+#define USART3_RX_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
+#define USART3_TX_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
+
+#define USART3_FORCE_RESET()             __USART3_FORCE_RESET()
+#define USART3_RELEASE_RESET()           __USART3_RELEASE_RESET()
+
+/* Definition for USARTx Pins */
+#define USART3_TX_PIN                    GPIO_PIN_10
+#define USART3_TX_GPIO_PORT              GPIOB
+#define USART3_TX_AF                     GPIO_MODE_OUTPUT_PP
+#define USART3_RX_PIN                    GPIO_PIN_11
+#define USART3_RX_GPIO_PORT              GPIOB
+#define USART3_RX_AF                     GPIO_MODE_AF_INPUT
+
+#endif /* RT_USING_UART3 */
 
 /* STM32 uart driver */
 struct drv_uart

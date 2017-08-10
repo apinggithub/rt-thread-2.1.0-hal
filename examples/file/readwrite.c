@@ -29,7 +29,7 @@ void readwrite(const char* filename)
 	/* 准备写入数据 */
 	for (index = 0; index < sizeof(test_data); index ++)
 	{
-		test_data[index] = index + 27;
+		test_data[index] = '7';
 	}
 
 	/* 写入数据 */

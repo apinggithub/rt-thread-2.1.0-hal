@@ -765,7 +765,10 @@ enum rt_device_class_type
 
 /**
  * device flags defitions
+
  */
+
+
 #define RT_DEVICE_FLAG_DEACTIVATE       0x000           /**< device is not not initialized */
 
 #define RT_DEVICE_FLAG_RDONLY           0x001           /**< read only */
@@ -782,6 +785,8 @@ enum rt_device_class_type
 #define RT_DEVICE_CTRL_SET_INT          0x10    	/* enable receive irq */
 #define RT_DEVICE_CTRL_CLR_INT          0x11    	/* disable receive irq */
 #define RT_DEVICE_CTRL_GET_INT          0x12
+#define RT_DEVICE_CTRL_SET_BUF_LEN      0x13
+
 
 #define RT_DEVICE_FLAG_INT_RX           0x100           /**< INT mode on Rx */
 #define RT_DEVICE_FLAG_DMA_RX           0x200           /**< DMA mode on Rx */

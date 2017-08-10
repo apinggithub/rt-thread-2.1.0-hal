@@ -34,14 +34,18 @@
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx.h"
 #include "stm32f1xx_it.h"
-
+#include "drv_iic_touch_ft5216.h"
 /* USER CODE BEGIN 0 */
 //#include "adctest/bsp_adc.h"
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart1;
+//extern uint8_t ft5216_rcv[];
 
+
+#define FT5216_PUT_UP    1									
+#define FT5216_PUT_DOWN  0
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
@@ -59,8 +63,29 @@ void NMI_Handler(void)
   /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
+void EXTI4_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
 
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+	//CTP_IO_Read(0,ft5216_rcv,30);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
 
+  /* USER CODE END EXTI4_IRQn 1 */
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
+
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+	////CTP_IO_Read(0,ft5216_rcv,30);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
+
+  /* USER CODE END EXTI4_IRQn 1 */
+}
 /**
 * @brief This function handles Memory management fault.
 */
@@ -172,6 +197,12 @@ void ADC_DMAx_CHANNELn_IRQHANDLER(void)
 /**
 * @brief This function handles USART1 global interrupt.
 */
+
+//uint8_t temp_rcvbuf[512];
+//uint16_t i = 0;
+
+
+
 
 //already defined in board.c
 //void USART1_IRQHandler(void)

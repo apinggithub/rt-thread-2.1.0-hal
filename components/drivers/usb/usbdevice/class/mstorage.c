@@ -767,7 +767,8 @@ static rt_size_t _cbw_handler(ufunction_t func, struct scsi_cmd* cmd,
     RT_ASSERT(func != RT_NULL);
     RT_ASSERT(cbw != RT_NULL);
     RT_ASSERT(cmd->handler != RT_NULL);
-    
+
+    
     data = (struct mstorage*)func->user_data;
     data->processing = cmd;
     return cmd->handler(func, cbw);

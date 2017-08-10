@@ -184,7 +184,7 @@ void main_thread_entry(void *parameter)
 
     /* RT-Thread components initialization */
     rt_components_init();
-
+    
     /* invoke system main function */
 #if defined (__CC_ARM)
     $Super$$main(); /* for ARMCC. */

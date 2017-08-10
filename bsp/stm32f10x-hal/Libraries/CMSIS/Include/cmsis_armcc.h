@@ -44,7 +44,7 @@
 /** \ingroup  CMSIS_Core_FunctionInterface
     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
   @{
- */
+ **/
 
 /* intrinsic void __enable_irq();     */
 /* intrinsic void __disable_irq();    */
@@ -53,7 +53,8 @@
   \brief   Get Control Register
   \details Returns the content of the Control Register.
   \return               Control Register value
- */
+ **/
+ 
 __STATIC_INLINE uint32_t __get_CONTROL(void)
 {
   register uint32_t __regControl         __ASM("control");

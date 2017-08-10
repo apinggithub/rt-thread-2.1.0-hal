@@ -65,6 +65,8 @@ void SystemClock_Config(void);
 
 /** System Clock Configuration
 */
+
+#define RT_USING_HSE
 void SystemClock_Config(void)
 {
 
@@ -73,6 +75,7 @@ void SystemClock_Config(void)
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
     /**Initializes the CPU, AHB and APB busses clocks 
     */
+	#ifdef RT_USING_HSE
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
@@ -96,6 +99,28 @@ void SystemClock_Config(void)
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
   PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6; /* 6分频，12MHz */
   HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+	#else
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = 16;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+    /**Initializes the CPU, AHB and APB busses clocks 
+    */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
+	
+	  /* Configur ADC clocks */
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6; /* 6分频，12MHz */
+  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+	#endif
 
     /**Configure the Systick interrupt time 
     */
@@ -107,21 +132,23 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-  
+  __HAL_RCC_AFIO_CLK_ENABLE();
 
   /**NOJTAG: JTAG-DP Disabled and SW-DP Enabled
     */
-  __HAL_RCC_AFIO_CLK_ENABLE();
+	#if 0
+  
   //__HAL_AFIO_REMAP_SWJ_NOJTAG();/* can not enter debug mode sometime */
   /**NONJTRST: Full SWJ (JTAG-DP + SW-DP) but without NJTRST
   */
-  __HAL_AFIO_REMAP_SWJ_NONJTRST();
+  __HAL_AFIO_REMAP_SWJ_NOJTAG();//__HAL_AFIO_REMAP_SWJ_NOJTAG();
   
   /* 输出低电平 */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);/*JTDI*/
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3|GPIO_PIN_4, GPIO_PIN_RESET);/*JTDO JNTRST*/
+	#endif
 }
 
 

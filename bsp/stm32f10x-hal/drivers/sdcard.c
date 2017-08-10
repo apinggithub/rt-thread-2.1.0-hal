@@ -19,9 +19,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "sdcard.h"
-#include "stm32f10x_dma.h"
-#include "stm32f10x_sdio.h"
+//#include "sdcard.h"
+//#include "stm32f10x_dma.h"
+//#include "stm32f10x_sdio.h"
 #include "stdbool.h"
 #include <rtthread.h>
 

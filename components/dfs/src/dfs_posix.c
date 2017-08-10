@@ -74,6 +74,11 @@ int open(const char *file, int flags, int mode)
     return fd;
 }
 RTM_EXPORT(open);
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+FINSH_FUNCTION_EXPORT(open,open or creat a file);
+#endif
+
 
 /**
  * this function is a POSIX compliant version, which will close the open
@@ -111,7 +116,10 @@ int close(int fd)
     return 0;
 }
 RTM_EXPORT(close);
-
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+FINSH_FUNCTION_EXPORT(close,close a file);
+#endif
 /**
  * this function is a POSIX compliant version, which will read specified data
  * buffer length for an open file descriptor.
@@ -200,7 +208,10 @@ int write(int fd, const void *buf, size_t len)
     return result;
 }
 RTM_EXPORT(write);
-
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+FINSH_FUNCTION_EXPORT(write,write specified dat.);
+#endif
 /**
  * this function is a POSIX compliant version, which will seek the offset for
  * an open file descriptor.
@@ -293,6 +304,10 @@ int rename(const char *old, const char *new)
     return 0;
 }
 RTM_EXPORT(rename);
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+FINSH_FUNCTION_EXPORT(rename,rename old file nameto new file name.);
+#endif
 
 /**
  * this function is a POSIX compliant version, which will unlink (remove) a
@@ -523,6 +538,7 @@ RTM_EXPORT(mkdir);
 #ifdef RT_USING_FINSH
 #include <finsh.h>
 FINSH_FUNCTION_EXPORT(mkdir, create a directory);
+//FINSH_FUNCTION_EXPORT(open,open or creat a file);
 #endif
 
 /**
