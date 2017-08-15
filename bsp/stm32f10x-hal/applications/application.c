@@ -48,10 +48,12 @@
 #include "drv_iic_touch_ft5216.h"
 #include "drv_stm32f10x_spi.h"
 #include "spi_flash_w25qxx.h"
+#include "drv_uart_finger.h"
+#include "usart_wifi_esp8266.h"
 //#include "bsp_EEPROM.h"
 
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t led_stack[1024];
+static rt_uint8_t led_stack[4096];
 static struct rt_thread led_thread;
 
 extern int rt_hw_lcd_init(void);
@@ -60,7 +62,7 @@ uint16_t lcdid;
 uint16_t ft5216id;
 static void led_thread_entry(void* parameter)
 {
-	
+	uint8_t i = 1;
     //unsigned int count=0;
 	
     rt_led_hw_init();
@@ -87,13 +89,28 @@ static void led_thread_entry(void* parameter)
 	 //ili9341_DrawLine(0,8,100,108,GREEN);
 	//LCD_Fill(0,0,100,50,RED);
 	//Draw_Circle(100,200,50,BRED);	
+	
 #endif
 	#endif	
     
     while (1)
     {
 		//ili9341_screen_clear(RED);
-		
+				{ 
+					
+					if(1 == i)
+					{
+						rt_device_t _wifi_device = rt_device_find("wifi_dev"); 
+						if(RT_NULL != _wifi_device)
+						{
+							_wifi_device->open(_wifi_device,0);
+							_wifi_device->control(_wifi_device,WIFI_JAP,"lzt02,lzt123456");
+							_wifi_device->control(_wifi_device,WIFI_SEND,"asdfghjkl");
+							i++;
+						}
+						
+				  }
+				}
         /* led1 on */
 #ifndef RT_USING_FINSH
         rt_kprintf("led on, count : %d\r\n",count);
@@ -117,7 +134,7 @@ static void led_thread_entry(void* parameter)
         
         //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
         rt_led_off();
-        rt_thread_delay( RT_TICK_PER_SECOND/2 );       
+        rt_thread_delay( RT_TICK_PER_SECOND*10 );       
     }
 }
 

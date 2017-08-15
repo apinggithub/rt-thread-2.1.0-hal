@@ -31,6 +31,8 @@ Others:   串口接收数据后，检测 关键字{"value":**}来获取 GET方法得到的数据
 #include "drivers/serial.h"
 #include "drv_led.h"
 #include "usart_wifi_esp8266.h"
+#include "cvt.h"
+#include <string.h>
 
 #ifdef RT_USING_UART_WIFI_ESP8266
 
@@ -54,12 +56,19 @@ Others:   串口接收数据后，检测 关键字{"value":**}来获取 GET方法得到的数据
 #define WSART_DEBUG(...)
 #endif /* #ifdef WIFI_DEBUG_ON */
 
+#define WIFI_LIST_AP_MAX 				5	
+
+static struct rt_mailbox wifi_mail;
+static uint32_t wifi_msg_pool[4];
 static struct rt_event rev_event;
 static rt_device_t wifi_device;
-rt_bool_t wifi_send(char * str);
-rt_bool_t wifi_jap(void);
+//rt_bool_t wifi_send(char * str);
+//rt_bool_t wifi_jap(void);
 rt_bool_t quit_wifi_connect(void);
+static rt_uart_extent_device_t _wifi_dev;
 
+static wifi_list_t _wifi_list_AP[WIFI_LIST_AP_MAX];
+static char wifi_status[1] = {0};
 /* 监视WIFI串口线程入口*/
 void wifiwatch_entry(void* parameter)
 {
@@ -70,8 +79,8 @@ void wifiwatch_entry(void* parameter)
 	char * charaddr;
 	char * charstartaddr;
 	char *  charendaddr;
-	uint8_t valuestr[3] = {0x00};
-	uint8_t value = 0;
+	//uint8_t valuestr[3] = {0x00};
+	//uint8_t value = 0;
   
   
   
@@ -87,38 +96,8 @@ void wifiwatch_entry(void* parameter)
 				rt_memset(wifi_rx_buffer,0x00,sizeof(wifi_rx_buffer));
 				rt_thread_delay(RT_TICK_PER_SECOND/2);
 				readnum = rt_device_read(wifi_device, 0, wifi_rx_buffer, 512);
+				rt_mb_send(&wifi_mail,(rt_uint32_t)wifi_rx_buffer);
 				WIFI_DEBUG(wifi_rx_buffer);
-				
-				/*以下获取串口接收数据 中的 value值 */
-				/*charaddr = rt_strstr(wifi_rx_buffer,"\"value\":");
-				if(charaddr!=RT_NULL)
-				{
-					WIFI_DEBUG(charaddr);    
-					charstartaddr = charaddr + 8;
-					charendaddr = rt_strstr(charaddr,"}") ;
-					if(charendaddr!=RT_NULL)
-					{
-						int i=0;
-						while (charstartaddr!=charendaddr)
-						{
-							valuestr[i] = *charstartaddr;
-							charstartaddr++;i++;
-						}
-						value = atoi((char const*)valuestr);
-						WIFI_DEBUG("\r\n Wifi Device receive value = %d \r\n",value );
-						if(value==1)
-						{
-							//LEDOn(LED1);
-							LED1_ON();
-						}
-						else if(value==0)
-						{
-							//LEDOff(LED1);
-							LED1_OFF(); 
-						}              
-					}
-				}*/
-				/*获取串口接收数据 中的 value值 结束 */
 			}
 			if (event & REV_STOPWATCH)
 			{
@@ -154,11 +133,13 @@ static rt_err_t wifi_uart_input(rt_device_t dev, rt_size_t size)
 }
 
 /*WIFI串口发送和接收*/
-rt_bool_t wifi_send_data_package( char *cmd,char *ack,uint16_t waittime, uint8_t retrytime)
+rt_bool_t wifi_send_data_package(char *cmd,char *ack,uint16_t waittime, uint8_t retrytime,char *ret)
 {
 	rt_bool_t res = RT_FALSE; 
 	rt_err_t result = RT_EOK;
 	rt_uint32_t event;
+	rt_uint32_t temp_offset = 0;;
+	rt_uint16_t count;
 	char wifi_rx_buffer[512]={0x00};
 	rt_thread_t thread;	
   
@@ -171,33 +152,56 @@ rt_bool_t wifi_send_data_package( char *cmd,char *ack,uint16_t waittime, uint8_t
 	do 
 	{
 		rt_device_write(wifi_device, 0, cmd, rt_strlen(cmd));   
-		
-		result = rt_event_recv(&rev_event, 
-							REV_MASK, RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR, 
-							waittime*RT_TICK_PER_SECOND, &event);
-		if (result == RT_EOK)
+		//count = 3;
+		temp_offset = 0;
+		for(count = 100;count > 0;)
 		{
-			if (event & REV_DATA)
+			result = rt_event_recv(&rev_event, 
+								REV_MASK, RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR, 
+								waittime*RT_TICK_PER_SECOND, &event);
+			if(result == RT_EOK)
 			{
-				rt_memset(wifi_rx_buffer,0x00,sizeof(wifi_rx_buffer));
-				rt_device_read(wifi_device, 0, wifi_rx_buffer, 512);
-				//WIFI_DEBUG(wifi_rx_buffer);
-				if((rt_strstr(wifi_rx_buffer,ack))||(rt_strstr(wifi_rx_buffer,"OK")))
+				if (event & REV_DATA)
 				{
-					res = RT_TRUE;
-				}
-				else
-				{
-					res = RT_FALSE;
-					rt_thread_delay( RT_TICK_PER_SECOND);
+					if(100 == count)
+						rt_memset(wifi_rx_buffer,0x00,sizeof(wifi_rx_buffer));
+					rt_device_read(wifi_device, 0, wifi_rx_buffer+temp_offset, 512);
+					//WIFI_DEBUG(wifi_rx_buffer);
+					if((rt_strstr(wifi_rx_buffer,ack))||(rt_strstr(wifi_rx_buffer,"OK")))
+					{
+						res = RT_TRUE;
+						if(RT_NULL != ret)
+								rt_strncpy(ret,wifi_rx_buffer,strlen(wifi_rx_buffer)); 
+						count = 0;
+					}
+					else if(rt_strstr(wifi_rx_buffer,"ERROR"))
+					{
+						res = RT_FALSE;
+						count = 0;
+						rt_thread_delay( RT_TICK_PER_SECOND/2 );
+					}
+					else
+					{
+						count--;
+						temp_offset = rt_strlen(wifi_rx_buffer);
+						if(temp_offset >500)
+							temp_offset = 0;
+					}
+					
 				}
 			}
+			else
+			{
+				count = 0;
+			}
+			 
 		}
 		retrytime--;
 	}while((RT_FALSE == res)&&(retrytime >= 1));
-	wifiwatch();
+	//wifiwatch();
 	return res;
 } 
+#if 0
 void wifijap_entry(void* parameter)
 {
 	rt_err_t result = RT_EOK;
@@ -229,7 +233,7 @@ void wifijap_entry(void* parameter)
 /*WIFI端口初始化，打开设备，注册回调函数*/
 rt_bool_t wifi_config(void)
 {
-	ESP8266_CS_Init();
+	
 	ESP8266_CS_HIGH();
 
 	wifi_device = rt_device_find(ESP8266_USARTx);//need to find the usart and open it
@@ -255,23 +259,6 @@ rt_bool_t wifi_config(void)
 	if(wifi_send_data_package(ESP8266_ATCMD,"OK",3,3))
 	{
 		WIFI_DEBUG("\r\n Wifi AT test OK !\r\n");
-		//return RT_TRUE;
-		wifi_jap();
-		{
-			//rt_thread_t thread;	
-  
-			/* 创建wifi watch线程*/
-			rt_thread_t thread = rt_thread_create("wifijap",
-										wifijap_entry, RT_NULL,
-										1024, 25, 7);
-  
-			/* 创建成功则启动线程*/
-			if (thread != RT_NULL)
-			{
-				rt_thread_startup(thread);
-				rt_event_send(&rev_event, JOIN_AP);
-			}
-		}
 	}
 	else
 	{
@@ -527,13 +514,233 @@ rt_bool_t wifi_exit(void) // wifi退出AP
 	}
     return RT_TRUE; 
 }
+#endif
+static rt_err_t rt_esp8266_init(rt_device_t dev)
+{
+  return RT_EOK;
+}
+
+static rt_err_t rt_esp8266_open(rt_device_t dev,rt_uint16_t oflag)
+{
+	
+	   ESP8266_CS_HIGH();
+    return RT_EOK;
+}
+
+static rt_err_t rt_esp8266_close(rt_device_t dev)
+{
+     ESP8266_CS_LOW();
+    return RT_EOK;
+}
+#if 0
+static rt_size_t rt_esp8266_write(rt_device_t dev,rt_off_t pos, void *buffer, rt_size_t size)
+{
+	return 0;
+}
+static rt_size_t rt_esp8266_read(rt_device_t dev,rt_off_t pos, const void *buffer, rt_size_t size)
+{
+	rt_err_t result = RT_EOK;
+	return 0;
+}
+#endif
+rt_uint16_t rt_SearchInsert(char *src,char *args)
+{
+	
+}
+rt_err_t wifi_send(void *args)
+{
+	//char temp_buf[20]={0};
+	//strcpy(temp_buf,"+++");
+	rt_device_write(wifi_device, 0, ESP8266_CIPMODE_CLOSED, 3);
+	//strcpy(temp_buf,"AT+CWMODE=1\x0D\x0A");
+	if(!wifi_send_data_package(ESP8266_CWMODE_STA,"OK",2,3,RT_NULL))//station 模式
+	{
+		return RT_ERROR;
+	}
+	//strcpy(temp_buf,"AT+CIPMUX=0\x0D\x0A");
+	if(!wifi_send_data_package(ESP8266_CIPMUX,"OK",2,3,RT_NULL))//单链接模式
+	{
+		return RT_ERROR;
+	}
+	//strcpy(temp_buf,"AT+CIPMODE=1\x0D\x0A");
+	if(!wifi_send_data_package(ESP8266_CIPMODE,"OK",2,3,RT_NULL))//透传
+	{
+		return RT_ERROR;
+	}
+	//strcpy(temp_buf,"AT+CIPSTART=\"TCP\",\"192.168.8.109\",8080\x0D\x0A");
+	if(!wifi_send_data_package(ESP8266_CIPSTART,"OK",2,3,RT_NULL))//连接远程服务器
+	{
+		return RT_ERROR;
+	}
+	if(!wifi_send_data_package(ESP8266_CIPSEND,">",2,3,RT_NULL))
+	{
+		return RT_ERROR;
+	}
+	wifiwatch();
+  rt_device_write(wifi_device, 0, args, rt_strlen(args)); 
+	
+	//rt_device_write(wifi_device, 0, ESP8266_CIPMODE_CLOSED, 3);
+  //rt_device_write(wifi_device, 0, temp_buf, 3);	
+	return RT_EOK;
+}
+rt_err_t wifi_list(char *buf)
+{
+	rt_size_t  temp_offset = 0;
+	char *list_begin = rt_strstr(buf+temp_offset,"+CWLAP:(");
+  for(uint8_t i = 0; list_begin&&(i < WIFI_LIST_AP_MAX); i++)
+	{
+		//rt_size_t temp_offset2 = list_begin - buf + sizeof("+CWLAP:(");
+		//char *list_begin = rt_strstr(buf+temp_offset,"+CWLAP:(");
+		char *ssid_end = rt_strstr(list_begin+sizeof("+CWLAP:(")+3,",");
+		char *rssi_end = rt_strstr(list_begin+sizeof("+CWLAP:(")+3,")");
+		rt_size_t ssid_len = (rt_size_t)(ssid_end - (list_begin+sizeof("+CWLAP:(")+3));
+		rt_size_t rssi_len = (rt_size_t)(rssi_end - (ssid_end+1));
+		rt_strncpy(_wifi_list_AP[i].ecn,list_begin+sizeof("+CWLAP:(")-1,1);
+		rt_strncpy(_wifi_list_AP[i].ssid,list_begin+sizeof("+CWLAP:(")+2,ssid_len);
+		rt_strncpy(_wifi_list_AP[i].rssi,ssid_end+1,rssi_len);
+		temp_offset = rssi_end - buf;
+		list_begin = rt_strstr(buf+temp_offset,"+CWLAP:(");
+	}	
+	if( 0 == temp_offset)
+		return RT_ERROR;
+	else
+		return RT_EOK;
+}	
+	
+rt_err_t joap_wifi(void *args)
+{
+	char recv_buf[100];
+	rt_device_write(wifi_device,0,ESP8266_CIPMODE_CLOSED, 3);
+	//strcpy(recv_buf,"AT+CWQAP\x0D\x0A");
+	if(wifi_send_data_package("AT+CWQAP\x0D\x0A","OK",3,6,RT_NULL))
+	{
+		if(wifi_send_data_package("AT+CWMODE=1\x0D\x0A","OK",2,3,RT_NULL))
+		{
+			char *ssid_end;
+			char *password; 
+      rt_size_t len1,len2,len3;
+			//strcat(args,"\"\0x0D\0xA");
+			ssid_end = rt_strstr(args,",");
+			len1 =  rt_strlen(args);
+			len2 =  rt_strlen(ssid_end);
+			len3 = len1 - len2;
+			//strcpy(args+len1,"\"\0x0D\0xA");
+			strcpy(recv_buf,"AT+CWJAP=\"\",\"\"\x0D\x0A");
+			strcpy(recv_buf+10,args);
+		  strcpy(recv_buf+10+len3,"\",\"");
+			strcpy(recv_buf+13+len3,ssid_end+1);
+			strcpy(recv_buf+12+len1,"\"\x0D\x0A");
+			if(wifi_send_data_package(recv_buf,"OK",2,3,RT_NULL))
+				return RT_EOK;
+			else
+				return RT_ERROR;
+		}
+		else
+			return RT_ERROR;
+	}
+	else
+		return RT_ERROR;
+	 
+}	
+	
+
+static rt_err_t rt_esp8266_control(rt_device_t dev, rt_uint8_t cmd, void *args)
+{
+    rt_err_t result = RT_EOK;
+	  char buf[512]={0};
+		#if 1
+		 switch(cmd)
+		 {
+			 case WIFI_LIST:
+				    if(wifi_send_data_package(ESP8266_CWLAPOPT,"OK",2,3,RT_NULL))//
+						{	
+							//strcpy(buf,"AT+CWLAP\x0D\x0A");
+							wifi_send_data_package(ESP8266_CWLAP,"OK",2,3,buf);
+							wifi_list(buf);
+						}
+						break;
+			 case WIFI_JAP:
+				    return(joap_wifi(args));
+			 case WIFI_QAP:
+				    return(!wifi_send_data_package(ESP8266_CWQAP,"OK",2,3,RT_NULL));
+			 case WIFI_SEND:
+				   return(wifi_send(args));
+			 case WIFI_STATUS:
+				    //strcpy(buf,"AT+CIPSTATUS\x0D\x0A");
+						rt_device_write(wifi_device,0,ESP8266_CIPMODE_CLOSED,3);
+				    if(wifi_send_data_package(ESP8266_CIPSTATUS,"OK",2,3,buf))
+						{	
+							char* status;
+							status = rt_strstr(buf,"STATUS:");
+              rt_strncpy(wifi_status,status+sizeof("STATUS:")-1,1);
+							rt_mb_send(&wifi_mail,(rt_uint32_t)wifi_status);
+							return RT_EOK;							
+						}
+				    else
+							return RT_ERROR;
+			 default:
+				 break;
+		 }			 
+		#endif
+    return result;
+}
+rt_err_t rt_hw_wifi_register(struct rt_uart_extent_device *finger_dev,
+                               const char              *name,
+                               rt_uint32_t              flag)
+{
+    struct rt_device *device;
+    RT_ASSERT(finger_dev != RT_NULL);
+
+    device = &(finger_dev->parent);
+
+    device->type        = RT_Device_Class_Char;
+    device->rx_indicate = RT_NULL;
+    device->tx_complete = RT_NULL;
+
+    device->init        = rt_esp8266_init;
+    device->open        = rt_esp8266_open;
+    device->close       = rt_esp8266_close;
+    device->read        = RT_NULL;
+    device->write       = RT_NULL;
+    device->control     = rt_esp8266_control;
+    device->user_data   = RT_NULL;
+
+    /* register a character device */
+    return rt_device_register(device, name, flag);
+}
+
+int rt_hw_wifi_init(void)
+{  
+	 ESP8266_CS_Init();
+   _wifi_dev.uart_dev = RT_NULL;
+	 
+	_wifi_dev.uart_dev = rt_device_find(ESP8266_USARTx);
+	wifi_device = _wifi_dev.uart_dev;
+  if (_wifi_dev.uart_dev != RT_NULL)    
+  {
+    /* 设置回调函数及打开设备*/
+    rt_device_set_rx_indicate(_wifi_dev.uart_dev, wifi_uart_input);
+    rt_device_open(_wifi_dev.uart_dev, RT_DEVICE_OFLAG_RDWR| RT_DEVICE_FLAG_STREAM | RT_DEVICE_FLAG_INT_RX); 	
+  }
+	else
+  {
+    return RT_FALSE;
+  }
+	rt_event_init(&rev_event, "rev_ev", RT_IPC_FLAG_FIFO);
+	rt_mb_init(&wifi_mail,"wifi_mail",&wifi_msg_pool,(sizeof(wifi_msg_pool))/4,RT_IPC_FLAG_FIFO);
+	rt_hw_wifi_register(&_wifi_dev,"wifi_dev",RT_DEVICE_FLAG_RDWR);
+	
+  return RT_TRUE;
+}
+INIT_COMPONENT_EXPORT(rt_hw_wifi_init);
+
 
 #ifdef RT_USING_FINSH
 #include <finsh.h>
-FINSH_FUNCTION_EXPORT(wifi_config, connect to usart and AT test.);
+//FINSH_FUNCTION_EXPORT(wifi_config, connect to usart and AT test.);
 //FINSH_FUNCTION_EXPORT(wifi_init, connect to usart.);
 //FINSH_FUNCTION_EXPORT(wifi_scan, SACN and list AP.);
-FINSH_FUNCTION_EXPORT(wifi_jap, ESP12F join to AP.);
+//FINSH_FUNCTION_EXPORT(wifi_jap, ESP12F join to AP.);
 //FINSH_FUNCTION_EXPORT(wifi_rssi, get ESP12F current AP rssi.);
 #endif /* RT_USING_FINSH */
 

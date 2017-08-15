@@ -390,7 +390,7 @@ rt_err_t w25qxx_init(const char * flash_device_name, const char * spi_device_nam
     rt_device_register(&spi_flash_device.flash_device, flash_device_name,
                        RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_STANDALONE);
 		
-		#if 1
+		#if 0
 		 {
 			 //uint16_t i;
 			 

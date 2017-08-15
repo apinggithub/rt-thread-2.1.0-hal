@@ -52,6 +52,11 @@
 
 #define FINGER_RECIVE_MAX 500
 
+#define REV_DATA      0x01
+#define FP_REG        0x02
+#define FP_SUCESS     0x04
+#define FP_FAILD      0x08
+
 #define FP_CMD_REG_FIRST            0xc1
 #define FP_CMD_REG_SECOND           0xc2
 #define FP_CMD_REG_THIRD            0xc3
@@ -91,7 +96,7 @@
 
 
 
-struct fp_cmdack{
+/*struct fp_cmdack{
 	rt_uint8_t   begin;
 	rt_uint8_t   cmd;
 	rt_uint8_t   num1_high;
@@ -100,7 +105,9 @@ struct fp_cmdack{
 	rt_uint8_t   num2_low;
 	rt_uint8_t   num2_check;
 	rt_uint8_t   end;
-};
+};*/
+
+
 
 //#endif // SPI_WIFI_H_INCLUDED
 #endif

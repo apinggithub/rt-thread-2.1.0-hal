@@ -115,7 +115,7 @@
 // <string name="RT_CONSOLE_DEVICE_NAME" description="The device name for console" default="uart1" />
 // if you use the console, and you need to configure the 'STM32_CONSOLE_USART' in board.h .
 #define RT_CONSOLE_DEVICE_NAME	    "uart1"
-
+#define FP_DEVICE_NAME	    				"uart2"
 
 
 

@@ -128,8 +128,8 @@ static int drv_putc(struct rt_serial_device *serial, char c)
     uart->UartHandle.Instance->DR = c;
     return 1;
 }
-//rt_uint8_t temp_uart3_recv[512]={0};
-//rt_uint16_t temp_uart3_i =0;
+rt_uint8_t temp_uart3_recv[512]={0};
+rt_uint16_t temp_uart3_i =0;
 rt_uint8_t temp_uart2_recv[508]={0};
 rt_uint16_t temp_uart_i = 0;
 static int drv_getc(struct rt_serial_device *serial)
@@ -154,14 +154,14 @@ static int drv_getc(struct rt_serial_device *serial)
 							temp_uart_i = 0;
 						}
 					}
-					/*if(USART3 == uart->UartHandle.Instance)
+					if(USART3 == uart->UartHandle.Instance)
 					{
 						temp_uart3_recv[temp_uart3_i++] = ch;
 						if(511 < temp_uart3_i)
 						{
 							temp_uart3_i = 0;
 						}
-					}*/
+					}
 			   }
 				
 		}	

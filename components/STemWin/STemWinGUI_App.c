@@ -37,7 +37,7 @@ void emWin_thread_entry(void *parameter)
 			GUI_SetBkColor(GUI_BLUE);
 			GUI_Clear();
 		}
-		rt_thread_delay(RT_TICK_PER_SECOND/10);
+		rt_thread_delay(RT_TICK_PER_SECOND);
 	}
 }
 

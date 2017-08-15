@@ -141,6 +141,12 @@ struct rt_serial_tx_dma
 	struct rt_data_queue data_queue;
 };
 
+typedef struct rt_uart_extent_device
+{   
+	  struct rt_device    parent;
+		rt_device_t         uart_dev;       	
+}rt_uart_extent_device_t;
+
 struct rt_serial_device
 {
     struct rt_device          parent;
