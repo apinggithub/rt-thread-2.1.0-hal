@@ -652,16 +652,20 @@ static rt_err_t rt_esp8266_control(rt_device_t dev, rt_uint8_t cmd, void *args)
 		 switch(cmd)
 		 {
 			 case WIFI_LIST:
+						rt_device_write(wifi_device,0,ESP8266_CIPMODE_CLOSED,3);
 				    if(wifi_send_data_package(ESP8266_CWLAPOPT,"OK",2,3,RT_NULL))//
 						{	
 							//strcpy(buf,"AT+CWLAP\x0D\x0A");
 							wifi_send_data_package(ESP8266_CWLAP,"OK",2,3,buf);
-							wifi_list(buf);
+							return(wifi_list(buf));
 						}
-						break;
+						else
+							return RT_ERROR;
 			 case WIFI_JAP:
+				    rt_device_write(wifi_device,0,ESP8266_CIPMODE_CLOSED,3);
 				    return(joap_wifi(args));
 			 case WIFI_QAP:
+				    rt_device_write(wifi_device,0,ESP8266_CIPMODE_CLOSED,3);
 				    return(!wifi_send_data_package(ESP8266_CWQAP,"OK",2,3,RT_NULL));
 			 case WIFI_SEND:
 				   return(wifi_send(args));
